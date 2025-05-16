@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Sistem Pendaftaran Kad</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Memproses...</p>
+    </div>
+  </div>
+
+  <div id="error-modal" class="modal">
+    <div class="modal-content">
+      <h2>Ralat</h2>
+      <p id="error-message"></p>
+      <button onclick="closeModal('error-modal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="notification-modal" class="modal">
+    <div class="modal-content">
+      <h2>Pemberitahuan</h2>
+      <p id="notification-message"></p>
+      <button onclick="closeModal('notification-modal')">Tutup</button>
+    </div>
+  </div>
+
+  <div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+      <h2>Pengesahan</h2>
+      <p id="confirmation-message"></p>
+      <div class="modal-buttons">
+        <button onclick="cancelConfirmation()">Batal</button>
+        <button onclick="confirmAction()">Ya</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="main-section" class="section active">
+    <div class="container">
+      <h1>Sistem Pendaftaran Kad Jabatan</h1>
+      <p>Jabatan Imigresen Malaysia Negeri Sarawak</p>
+      <div class="tabs">
+        <div class="tab active" onclick="showSection('register')">Daftar</div>
+        <div class="tab" onclick="showSection('update')">Kemaskini</div>
+        <div class="tab" onclick="showSection('lost')">Kehilangan</div>
+        <div class="tab" onclick="showSection('settings')">Tetapan</div>
+        <div class="tab" onclick="showPreview()">Preview</div>
+        <div class="tab" onclick="logout()">Log Keluar</div>
+      </div>
+
+      <div id="register-section" class="section-content active">
+        <h2>Pendaftaran Baru</h2>
+        <form id="register-form">
+          <div class="form-row">
+            <div class="form-column">
+              <h3>Maklumat Asas</h3>
+              <div class="form-group">
+                <label for="register-unique-id">ID Kad</label>
+                <div class="unique-id-group">
+                  <span>JIMSWK</span>
+                  <input type="text" id="register-unique-id" placeholder="Masukkan 4 digit" maxlength="4" required>
+                  <button type="button" onclick="checkUniqueId()">Semak</button>
+                </div>
+                <p id="unique-id-status"></p>
+              </div>
+              <div class="form-group">
+                <label for="register-name">Nama Penuh</label>
+                <input type="text" id="register-name" required>
+              </div>
+              <div class="form-group">
+                <label for="register-display-name">Nama untuk Kad</label>
+                <select id="register-display-name">
+                  <option value="">Pilih Nama</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="register-ic">No. Kad Pengenalan</label>
+                <input type="text" id="register-ic" required>
+              </div>
+              <div class="form-group">
+                <label for="register-phone">No. Telefon</label>
+                <input type="text" id="register-phone" required>
+              </div>
+            </div>
+            <div class="form-column">
+              <h3>Maklumat Tambahan</h3>
+              <div class="form-group">
+                <label for="register-position">Jawatan</label>
+                <select id="register-position" required>
+                  <option value="">Pilih Jawatan</option>
+                  <option value="Pengarah Imigresen Negeri">Pengarah Imigresen Negeri</option>
+                  <option value="Timbalan Pengarah Imigresen Negeri (Pentadbiran)">Timbalan Pengarah Imigresen Negeri (Pentadbiran)</option>
+                  <option value="Timbalan Pengarah Imigresen Negeri (Kawalan)">Timbalan Pengarah Imigresen Negeri (Kawalan)</option>
+                  <option value="Penolong Pengarah Imigresen Kanan">Penolong Pengarah Imigresen Kanan</option>
+                  <option value="Penolong Pengarah Imigresen">Penolong Pengarah Imigresen</option>
+                  <option value="Ketua Timbalan Penolong Pengarah Imigresen">Ketua Timbalan Penolong Pengarah Imigresen</option>
+                  <option value="Timbalan Penolong Pengarah Imigresen Kanan">Timbalan Penolong Pengarah Imigresen Kanan</option>
+                  <option value="Timbalan Penolong Pengarah Imigresen">Timbalan Penolong Pengarah Imigresen</option>
+                  <option value="Ketua Pegawai Imigresen Tinggi">Ketua Pegawai Imigresen Tinggi</option>
+                  <option value="Pegawai Imigresen Tinggi">Pegawai Imigresen Tinggi</option>
+                  <option value="Pegawai Imigresen Kanan">Pegawai Imigresen Kanan</option>
+                  <option value="Pegawai Imigresen">Pegawai Imigresen</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="register-status">Status</label>
+                <input type="text" id="register-status">
+              </div>
+              <div class="form-group">
+                <label for="register-emergency-contact">Nama Waris</label>
+                <input type="text" id="register-emergency-contact">
+              </div>
+              <div class="form-group">
+                <label for="register-emergency-phone">No. Telefon Waris</label>
+                <input type="text" id="register-emergency-phone">
+              </div>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label for="register-medical-condition">Penyakit (Jika ada)</label>
+            <textarea id="register-medical-condition"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label for="register-photo">Foto (Latar Belakang Putih)</label>
+            <input type="file" id="register-photo" accept="image/jpeg,image/png">
+            <button type="button" onclick="openCamera('register')">Ambil Gambar</button>
+            <p>Format: JPEG/PNG, Maksimum 2MB</p>
+          </div>
+          <div id="camera-modal" class="modal">
+            <div class="modal-content">
+              <h2>Ambil Gambar</h2>
+              <video id="camera-video"></video>
+              <div class="modal-buttons">
+                <button onclick="capturePhoto('register')">Tangkap</button>
+                <button onclick="closeCamera()">Batal</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-buttons">
+            <button type="submit" onclick="saveRegistration()">Simpan Pendaftaran</button>
+            <button type="button" onclick="resetRegisterForm()">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="update-section" class="section-content">
+        <h2>Kemaskini Maklumat</h2>
+        <div class="search-group">
+          <input type="text" id="update-search" placeholder="ID Kad / No. Kad Pengenalan">
+          <button onclick="searchRecord()">Cari</button>
+        </div>
+        <form id="update-form">
+          <div class="form-row">
+            <div class="form-column">
+              <h3>Maklumat Asas</h3>
+              <div class="form-group">
+                <label for="update-unique-id">ID Kad</label>
+                <input type="text" id="update-unique-id" readonly>
+              </div>
+              <div class="form-group">
+                <label for="update-name">Nama Penuh</label>
+                <input type="text" id="update-name" required>
+              </div>
+              <div class="form-group">
+                <label for="update-display-name">Nama untuk Kad</label>
+                <select id="update-display-name">
+                  <option value="">Pilih Nama</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="update-ic">No. Kad Pengenalan</label>
+                <input type="text" id="update-ic" required>
+              </div>
+              <div class="form-group">
+                <label for="update-phone">No. Telefon</label>
+                <input type="text" id="update-phone" required>
+              </div>
+            </div>
+            <div class="form-column">
+              <h3>Maklumat Tambahan</h3>
+              <div class="form-group">
+                <label for="update-position">Jawatan</label>
+                <select id="update-position" required>
+                  <option value="">Pilih Jawatan</option>
+                  <option value="Pengarah Imigresen Negeri">Pengarah Imigresen Negeri</option>
+                  <option value="Timbalan Pengarah Imigresen Negeri (Pentadbiran)">Timbalan Pengarah Imigresen Negeri (Pentadbiran)</option>
+                  <option value="Timbalan Pengarah Imigresen Negeri (Kawalan)">Timbalan Pengarah Imigresen Negeri (Kawalan)</option>
+                  <option value="Penolong Pengarah Imigresen Kanan">Penolong Pengarah Imigresen Kanan</option>
+                  <option value="Penolong Pengarah Imigresen">Penolong Pengarah Imigresen</option>
+                  <option value="Ketua Timbalan Penolong Pengarah Imigresen">Ketua Timbalan Penolong Pengarah Imigresen</option>
+                  <option value="Timbalan Penolong Pengarah Imigresen Kanan">Timbalan Penolong Pengarah Imigresen Kanan</option>
+                  <option value="Timbalan Penolong Pengarah Imigresen">Timbalan Penolong Pengarah Imigresen</option>
+                  <option value="Ketua Pegawai Imigresen Tinggi">Ketua Pegawai Imigresen Tinggi</option>
+                  <option value="Pegawai Imigresen Tinggi">Pegawai Imigresen Tinggi</option>
+                  <option value="Pegawai Imigresen Kanan">Pegawai Imigresen Kanan</option>
+                  <option value="Pegawai Imigresen">Pegawai Imigresen</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="update-status">Status</label>
+                <input type="text" id="update-status">
+              </div>
+              <div class="form-group">
+                <label for="update-emergency-contact">Nama Waris</label>
+                <input type="text" id="update-emergency-contact">
+              </div>
+              <div class="form-group">
+                <label for="update-emergency-phone">No. Telefon Waris</label>
+                <input type="text" id="update-emergency-phone">
+              </div>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label for="update-medical-condition">Penyakit (Jika ada)</label>
+            <textarea id="update-medical-condition"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Gambar Lama</label>
+            <img id="update-old-photo" src="" alt="Gambar Lama">
+          </div>
+          <div class="form-group full-width">
+            <label for="update-photo">Foto Baru (Latar Belakang Putih)</label>
+            <input type="file" id="update-photo" accept="image/jpeg,image/png">
+            <button type="button" onclick="openCamera('update')">Ambil Gambar</button>
+            <p>Format: JPEG/PNG, Maksimum 2MB</p>
+          </div>
+          <div class="form-buttons">
+            <button type="submit" onclick="updateRecord()">Simpan Perubahan</button>
+            <button type="button" onclick="reprintForUpdate()">Cetak Semula</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="lost-section" class="section-content">
+        <h2>Laporan Kehilangan</h2>
+        <div class="search-group">
+          <input type="text" id="lost-search" placeholder="ID Kad / No. Kad Pengenalan">
+          <button onclick="searchLostRecord()">Cari</button>
+        </div>
+        <div id="lost-details">
+          <h3>Maklumat Kad</h3>
+          <div class="details-row">
+            <p><strong>ID Kad:</strong> <span id="lost-unique-id"></span></p>
+            <p><strong>Nama:</strong> <span id="lost-name"></span></p>
+            <p><strong>No. Kad Pengenalan:</strong> <span id="lost-ic"></span></p>
+            <p><strong>No. Telefon:</strong> <span id="lost-phone"></span></p>
+          </div>
+          <div class="details-row">
+            <p><strong>Jawatan:</strong> <span id="lost-position"></span></p>
+            <p><strong>Status:</strong> <span id="lost-status"></span></p>
+            <p><strong>Nama Waris:</strong> <span id="lost-emergency-contact"></span></p>
+            <p><strong>No. Telefon Waris:</strong> <span id="lost-emergency-phone"></span></p>
+          </div>
+          <button onclick="reportLost()">Laporkan Hilang</button>
+        </div>
+        <div id="registered-list">
+          <h3>Senarai Pendaftar</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>ID Kad</th>
+                <th>Jabatan</th>
+                <th>Jumlah Cetak</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="registered-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="settings-section" class="section-content">
+        <h2>Tetapan Sistem</h2>
+        <div id="password-section">
+          <h3>Tukar Kata Laluan</h3>
+          <form id="password-form">
+            <div class="form-group">
+              <label for="current-password">Kata Laluan Semasa</label>
+              <input type="password" id="current-password" required>
+            </div>
+            <div class="form-group">
+              <label for="new-password">Kata Laluan Baru</label>
+              <input type="password" id="new-password" required>
+            </div>
+            <div class="form-group">
+              <label for="confirm-password">Sahkan Kata Laluan Baru</label>
+              <input type="password" id="confirm-password" required>
+            </div>
+            <button type="submit" onclick="changePassword()">Tukar Kata Laluan</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="preview-section" class="section-content">
+        <h2>Preview Kad Jabatan</h2>
+        <div class="search-group">
+          <input type="text" id="preview-search" placeholder="ID Kad">
+          <button onclick="previewCard()">Cari</button>
+        </div>
+        <div id="preview-content">
+          <div class="preview-card">
+            <h3>Depan</h3>
+            <img id="preview-front" src="" alt="Depan Kad">
+            <button onclick="downloadCard('front')">Muat Turun Depan</button>
+          </div>
+          <div class="preview-card">
+            <h3>Belakang</h3>
+            <img id="preview-back" src="" alt="Belakang Kad">
+            <button onclick="downloadCard('back')">Muat Turun Belakang</button>
+          </div>
+        </div>
+        <div id="preview-empty">
+          <p>Kad tidak ditemukan</p>
+          <p>Sila cari menggunakan ID Kad atau daftar kad baru</p>
+        </div>
+        <button onclick="backToMain()">Kembali</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 Jabatan Imigresen Malaysia Negeri Sarawak. Hak Cipta Terpelihara. Disediakan oleh: PI KP2 (TBK1) Mohammad Azzer bin Taip. Unit Perancangan Strategik dan Khidmat Korporat.</p>
+  </footer>
+
+  <script src="js/scripts.js"></script>
+</body>
+</html>
