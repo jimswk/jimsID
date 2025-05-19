@@ -47,6 +47,7 @@ document.getElementById('loginButton').addEventListener('click', () => {
   showModal('loadingModal');
   fetch(`${scriptURL}?action=verifyLogin`, {
     method: 'POST',
+    mode: 'no-cors',
     body: JSON.stringify({ username, password }),
     headers: { 'Content-Type': 'application/json' }
   })
