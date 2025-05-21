@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbwcnDxJ_aLuk-U90qfx8LCetqEfkUn7zvH0TOD9wA_FghqjRfLbdZsWC742yhRgkScy/exec'; // Replace with your Google Apps Script Web App URL
+const API_URL = 'https://script.google.com/macros/s/AKfycbyowSt2IyiKGDojhc-gEagzsSLZP-knymWycRkDw-oQMSUq9eIRolX15n4OvEaKKNuH/exec'; // Replace with your Google Apps Script Web App URL
 
 // Utility Functions
 function showModal(modalId, message = '') {
