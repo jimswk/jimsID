@@ -5,124 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Pendaftaran Jabatan Imigresen Malaysia Negeri Sarawak</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="styles.css" rel="stylesheet">
-  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen">
+<body class="bg-gray-100 min-h-screen flex flex-col">
   <!-- Loading Modal -->
-  <div id="loadingModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-      <p class="text-lg">Memproses...</p>
+  <div id="loadingModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg">
+      <p>Memproses...</p>
     </div>
   </div>
 
   <!-- Error Modal -->
-  <div id="errorModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-      <h2 class="text-xl font-bold text-red-600">Ralat</h2>
-      <p id="errorMessage" class="mt-2"></p>
+  <div id="errorModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg max-w-md">
+      <h3 class="text-lg font-bold mb-4">Ralat</h3>
+      <p id="errorMessage"></p>
       <button id="closeErrorModal" class="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Tutup</button>
     </div>
   </div>
 
-  <!-- Notification Modal -->
-  <div id="notificationModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-      <h2 class="text-xl font-bold text-green-600">Pemberitahuan</h2>
-      <p id="notificationMessage" class="mt-2"></p>
-      <button id="closeNotificationModal" class="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Tutup</button>
+  <!-- Success Modal -->
+  <div id="successModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg max-w-md">
+      <h3 class="text-lg font-bold mb-4">Pemberitahuan</h3>
+      <p id="successMessage"></p>
+      <button id="closeSuccessModal" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Tutup</button>
     </div>
   </div>
 
   <!-- Confirmation Modal -->
-  <div id="confirmationModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-      <h2 class="text-xl font-bold text-blue-600">Pengesahan</h2>
-      <p id="confirmationMessage" class="mt-2"></p>
+  <div id="confirmationModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg max-w-md">
+      <h3 class="text-lg font-bold mb-4">Pengesahan</h3>
+      <p id="confirmationMessage"></p>
       <div class="mt-4 flex justify-end space-x-2">
         <button id="cancelConfirmation" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Batal</button>
-        <button id="confirmAction" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Ya</button>
+        <button id="confirmConfirmation" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Ya</button>
       </div>
     </div>
   </div>
 
   <!-- Login Section -->
-  <div id="loginSection" class="container mx-auto p-4 flex-grow">
-    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
-      <h1 class="text-2xl font-bold text-center">Sistem Pendaftaran Kad Jabatan</h1>
+  <div id="loginSection" class="flex-1 flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <h1 class="text-2xl font-bold text-center mb-2">Sistem Pendaftaran Kad Jabatan</h1>
       <h2 class="text-lg text-center mb-6">Jabatan Imigresen Malaysia Negeri Sarawak</h2>
       <div class="space-y-4">
         <div>
           <label for="username" class="block text-sm font-medium">No. Kad Pengenalan</label>
-          <input type="text" id="username" class="w-full p-2 border rounded">
+          <input type="text" id="username" class="w-full border rounded px-3 py-2 mt-1">
         </div>
         <div>
           <label for="password" class="block text-sm font-medium">Kata Laluan</label>
-          <input type="password" id="password" class="w-full p-2 border rounded">
+          <input type="password" id="password" class="w-full border rounded px-3 py-2 mt-1">
         </div>
-        <button id="loginButton" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Log Masuk</button>
+        <button id="loginButton" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Log Masuk</button>
       </div>
     </div>
   </div>
 
-  <!-- Main Dashboard -->
-  <div id="mainSection" class="container mx-auto p-4 hidden flex-grow">
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-      <h1 class="text-2xl font-bold text-center">Sistem Pendaftaran Kad Jabatan</h1>
-      <h2 class="text-lg text-center mb-6">Jabatan Imigresen Malaysia Negeri Sarawak</h2>
-      
-      <!-- Navigation -->
-      <nav class="flex justify-center space-x-4 mb-6">
-        <button id="registerTab" class="tab-button bg-blue-500 text-white px-4 py-2 rounded">Daftar</button>
-        <button id="updateTab" class="tab-button bg-gray-300 text-gray-700 px-4 py-2 rounded">Kemaskini</button>
-        <button id="lostTab" class="tab-button bg-gray-300 text-gray-700 px-4 py-2 rounded">Kehilangan</button>
-        <button id="settingsTab" class="tab-button bg-gray-300 text-gray-700 px-4 py-2 rounded">Tetapan</button>
-        <button id="previewTab" class="tab-button bg-gray-300 text-gray-700 px-4 py-2 rounded">Preview</button>
-        <button id="logoutButton" class="bg-red-500 text-white px-4 py-2 rounded">Log Keluar</button>
-      </nav>
+  <!-- Main Section (Hidden Initially) -->
+  <div id="mainSection" class="hidden flex-1">
+    <div class="container mx-auto p-4">
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h1 class="text-2xl font-bold text-center mb-2">Sistem Pendaftaran Kad Jabatan</h1>
+        <h2 class="text-lg text-center mb-6">Jabatan Imigresen Malaysia Negeri Sarawak</h2>
+        <nav class="flex justify-center space-x-4">
+          <button id="registerTab" class="tab-button bg-blue-500 text-white px-4 py-2 rounded">Daftar</button>
+          <button id="updateTab" class="tab-button bg-gray-300 text-black px-4 py-2 rounded">Kemaskini</button>
+          <button id="lostTab" class="tab-button bg-gray-300 text-black px-4 py-2 rounded">Kehilangan</button>
+          <button id="settingsTab" class="tab-button bg-gray-300 text-black px-4 py-2 rounded">Tetapan</button>
+          <button id="previewTab" class="tab-button bg-gray-300 text-black px-4 py-2 rounded">Preview</button>
+          <button id="logoutButton" class="tab-button bg-red-500 text-white px-4 py-2 rounded">Log Keluar</button>
+        </nav>
+      </div>
 
-      <!-- Register Section -->
+      <!-- Registration Section -->
       <div id="registerSection" class="tab-content">
         <h3 class="text-xl font-bold mb-4">Pendaftaran Baru</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 class="font-bold mb-2">Maklumat Asas</h4>
+            <h4 class="text-lg font-semibold mb-2">Maklumat Asas</h4>
             <div class="space-y-4">
               <div>
                 <label for="uniqueId" class="block text-sm font-medium">ID Kad</label>
-                <div class="flex">
-                  <span class="inline-flex items-center px-3 bg-gray-200 border border-r-0 rounded-l">JIMSWK</span>
-                  <input type="text" id="uniqueId" class="flex-1 p-2 border rounded-r">
-                  <button id="checkUniqueId" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Semak</button>
+                <div class="flex items-center">
+                  <span class="border rounded-l px-3 py-2 bg-gray-200">JIMSWK</span>
+                  <input type="text" id="uniqueId" class="border rounded-r px-3 py-2 flex-1">
+                  <button id="checkIdButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Semak</button>
                 </div>
-                <p id="uniqueIdMessage" class="text-sm text-gray-600 mt-1"></p>
+                <p id="idAvailability" class="text-sm text-gray-500 mt-1"></p>
               </div>
               <div>
                 <label for="name" class="block text-sm font-medium">Nama Penuh</label>
-                <input type="text" id="name" class="w-full p-2 border rounded">
+                <input type="text" id="name" class="w-full border rounded px-3 py-2 mt-1">
               </div>
               <div>
                 <label for="displayName" class="block text-sm font-medium">Nama untuk Kad</label>
-                <select id="displayName" class="w-full p-2 border rounded">
+                <select id="displayName" class="w-full border rounded px-3 py-2 mt-1">
                   <option value="">Pilih Nama</option>
                 </select>
               </div>
               <div>
                 <label for="icNumber" class="block text-sm font-medium">No. Kad Pengenalan</label>
-                <input type="text" id="icNumber" class="w-full p-2 border rounded">
+                <input type="text" id="icNumber" class="w-full border rounded px-3 py-2 mt-1">
               </div>
               <div>
                 <label for="phone" class="block text-sm font-medium">No. Telefon</label>
-                <input type="text" id="phone" class="w-full p-2 border rounded">
+                <input type="text" id="phone" class="w-full border rounded px-3 py-2 mt-1">
               </div>
             </div>
           </div>
           <div>
-            <h4 class="font-bold mb-2">Maklumat Tambahan</h4>
+            <h4 class="text-lg font-semibold mb-2">Maklumat Tambahan</h4>
             <div class="space-y-4">
               <div>
                 <label for="position" class="block text-sm font-medium">Jawatan</label>
-                <select id="position" class="w-full p-2 border rounded">
+                <select id="position" class="w-full border rounded px-3 py-2 mt-1">
                   <option value="">Pilih Jawatan</option>
                   <option value="Pengarah Imigresen Negeri">Pengarah Imigresen Negeri</option>
                   <option value="Timbalan Pengarah Imigresen Negeri (Pentadbiran)">Timbalan Pengarah Imigresen Negeri (Pentadbiran)</option>
@@ -140,43 +139,42 @@
               </div>
               <div>
                 <label for="status" class="block text-sm font-medium">Status</label>
-                <input type="text" id="status" class="w-full p-2 border rounded">
+                <input type="text" id="status" class="w-full border rounded px-3 py-2 mt-1">
               </div>
               <div>
                 <label for="emergencyContact" class="block text-sm font-medium">Nama Waris</label>
-                <input type="text" id="emergencyContact" class="w-full p-2 border rounded">
+                <input type="text" id="emergencyContact" class="w-full border rounded px-3 py-2 mt-1">
               </div>
               <div>
                 <label for="emergencyPhone" class="block text-sm font-medium">No. Telefon Waris</label>
-                <input type="text" id="emergencyPhone" class="w-full p-2 border rounded">
+                <input type="text" id="emergencyPhone" class="w-full border rounded px-3 py-2 mt-1">
               </div>
             </div>
           </div>
         </div>
-        <div class="mt-4">
+        <div class="mt-6">
           <label for="medicalCondition" class="block text-sm font-medium">Penyakit (Jika ada)</label>
-          <textarea id="medicalCondition" class="w-full p-2 border rounded"></textarea>
+          <textarea id="medicalCondition" class="w-full border rounded px-3 py-2 mt-1"></textarea>
         </div>
         <div class="mt-4">
           <label for="photo" class="block text-sm font-medium">Foto (Latar Belakang Putih)</label>
-          <input type="file" id="photo" accept="image/jpeg,image/png" class="w-full p-2 border rounded">
-          <button id="capturePhoto" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Ambil Gambar</button>
-          <p class="text-sm text-gray-600 mt-1">Format: JPEG/PNG, Maksimum 2MB</p>
-          <div id="cameraModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-              <h2 class="text-xl font-bold">Ambil Gambar</h2>
-              <video id="video" class="mt-2" width="320" height="240"></video>
-              <canvas id="canvas" class="hidden"></canvas>
-              <div class="mt-4 flex justify-end space-x-2">
-                <button id="takePhoto" class="bg-blue-500 text-white px-4 py-2 rounded">Tangkap</button>
-                <button id="cancelCamera" class="bg-gray-500 text-white px-4 py-2 rounded">Batal</button>
-              </div>
+          <input type="file" id="photo" accept="image/jpeg,image/png" class="w-full border rounded px-3 py-2 mt-1">
+          <button id="capturePhotoButton" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Ambil Gambar</button>
+          <p class="text-sm text-gray-500 mt-1">Format: JPEG/PNG, Maksimum 2MB</p>
+        </div>
+        <div id="cameraModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded-lg">
+            <video id="video" class="w-full max-w-md" autoplay></video>
+            <canvas id="canvas" class="hidden"></canvas>
+            <div class="mt-4 flex justify-end space-x-2">
+              <button id="captureButton" class="bg-blue-500 text-white px-4 py-2 rounded">Tangkap</button>
+              <button id="cancelCapture" class="bg-gray-500 text-white px-4 py-2 rounded">Batal</button>
             </div>
           </div>
         </div>
-        <div class="mt-6 flex justify-end space-x-2">
-          <button id="saveRegistration" class="bg-green-500 text-white px-4 py-2 rounded">Simpan Pendaftaran</button>
-          <button id="resetRegistration" class="bg-gray-500 text-white px-4 py-2 rounded">Reset</button>
+        <div class="mt-6 flex space-x-4">
+          <button id="saveRegistrationButton" class="bg-blue-500 text-white px-4 py-2 rounded">Simpan Pendaftaran</button>
+          <button id="resetRegistrationButton" class="bg-gray-500 text-white px-4 py-2 rounded">Reset</button>
         </div>
       </div>
 
@@ -185,45 +183,45 @@
         <h3 class="text-xl font-bold mb-4">Kemaskini Maklumat</h3>
         <div class="mb-4">
           <label for="searchUpdate" class="block text-sm font-medium">ID Kad / No. Kad Pengenalan</label>
-          <div class="flex">
-            <input type="text" id="searchUpdate" class="flex-1 p-2 border rounded">
+          <div class="flex items-center">
+            <input type="text" id="searchUpdate" class="w-full border rounded px-3 py-2">
             <button id="searchUpdateButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Cari</button>
           </div>
         </div>
-        <div id="updateForm" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div id="updateForm" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 class="font-bold mb-2">Maklumat Asas</h4>
+            <h4 class="text-lg font-semibold mb-2">Maklumat Asas</h4>
             <div class="space-y-4">
               <div>
                 <label for="updateUniqueId" class="block text-sm font-medium">ID Kad</label>
-                <input type="text" id="updateUniqueId" class="w-full p-2 border rounded" readonly>
+                <input type="text" id="updateUniqueId" class="w-full border rounded px-3 py-2 mt-1" readonly>
               </div>
               <div>
                 <label for="updateName" class="block text-sm font-medium">Nama Penuh</label>
-                <input type="text" id="updateName" class="w-full p-2 border rounded">
+                <input type="text" id="updateName" class="w-full border rounded px-3 py-2 mt-1">
               </div>
               <div>
                 <label for="updateDisplayName" class="block text-sm font-medium">Nama untuk Kad</label>
-                <select id="updateDisplayName" class="w-full p-2 border rounded">
+                <select id="updateDisplayName" class="w-full border rounded px-3 py-2 mt-1">
                   <option value="">Pilih Nama</option>
                 </select>
               </div>
               <div>
                 <label for="updateIcNumber" class="block text-sm font-medium">No. Kad Pengenalan</label>
-                <input type="text" id="updateIcNumber" class="w-full p-2 border rounded">
+                <input type="text" id="updateIcNumber" class="w-full border rounded px-3 py-2 mt-1">
               </div>
               <div>
                 <label for="updatePhone" class="block text-sm font-medium">No. Telefon</label>
-                <input type="text" id="updatePhone" class="w-full p-2 border rounded">
+                <input type="text" id="updatePhone" class="w-full border rounded px-3 py-2 mt-1">
               </div>
             </div>
           </div>
           <div>
-            <h4 class="font-bold mb-2">Maklumat Tambahan</h4>
+            <h4 class="text-lg font-semibold mb-2">Maklumat Tambahan</h4>
             <div class="space-y-4">
               <div>
                 <label for="updatePosition" class="block text-sm font-medium">Jawatan</label>
-                <select id="updatePosition" class="w-full p-2 border rounded">
+                <select id="updatePosition" class="w-full border rounded px-3 py-2 mt-1">
                   <option value="">Pilih Jawatan</option>
                   <option value="Pengarah Imigresen Negeri">Pengarah Imigresen Negeri</option>
                   <option value="Timbalan Pengarah Imigresen Negeri (Pentadbiran)">Timbalan Pengarah Imigresen Negeri (Pentadbiran)</option>
@@ -241,34 +239,33 @@
               </div>
               <div>
                 <label for="updateStatus" class="block text-sm font-medium">Status</label>
-                <input type="text" id="updateStatus" class="w-full p-2 border rounded">
+                <input type="text" id="updateStatus" class="w-full border rounded px-3 py-2 mt-1">
               </div>
               <div>
                 <label for="updateEmergencyContact" class="block text-sm font-medium">Nama Waris</label>
-                <input type="text" id="updateEmergencyContact" class="w-full p-2 border rounded">
+                <input type="text" id="updateEmergencyContact" class="w-full border rounded px-3 py-2 mt-1">
               </div>
               <div>
                 <label for="updateEmergencyPhone" class="block text-sm font-medium">No. Telefon Waris</label>
-                <input type="text" id="updateEmergencyPhone" class="w-full p-2 border rounded">
+                <input type="text" id="updateEmergencyPhone" class="w-full border rounded px-3 py-2 mt-1">
               </div>
             </div>
           </div>
-          <div class="mt-4">
+          <div class="mt-6">
             <label for="updateMedicalCondition" class="block text-sm font-medium">Penyakit (Jika ada)</label>
-            <textarea id="updateMedicalCondition" class="w-full p-2 border rounded"></textarea>
+            <textarea id="updateMedicalCondition" class="w-full border rounded px-3 py-2 mt-1"></textarea>
           </div>
           <div class="mt-4">
             <label class="block text-sm font-medium">Gambar Lama</label>
-            <img id="oldPhoto" class="w-32 h-32 object-cover border rounded" src="" alt="Gambar Lama">
-            <label for="updatePhoto" class="block text-sm font-medium mt-2">Foto Baru (Latar Belakang Putih)</label>
-            <input type="file" id="updatePhoto" accept="image/jpeg,image/png" class="w-full p-2 border rounded">
-            <button id="updateCapturePhoto" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Ambil Gambar</button>
-            <p class="text-sm text-gray-600 mt-1">Format: JPEG/PNG, Maksimum 2MB</p>
+            <img id="updatePhotoPreview" class="w-32 h-32 object-cover border rounded mt-1">
+            <label for="updatePhoto" class="block text-sm font-medium mt-4">Foto Baru (Latar Belakang Putih)</label>
+            <input type="file" id="updatePhoto" accept="image/jpeg,image/png" class="w-full border rounded px-3 py-2 mt-1">
+            <button id="updateCapturePhotoButton" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Ambil Gambar</button>
+            <p class="text-sm text-gray-500 mt-1">Format: JPEG/PNG, Maksimum 2MB</p>
           </div>
-        </div>
-        <div id="updateButtons" class="mt-6 flex justify-end space-x-2 hidden">
-          <button id="reprintButton" class="bg-blue-500 text-white px-4 py-2 rounded">Cetak Semula</button>
-          <button id="updateAndReprintButton" class="bg-green-500 text-white px-4 py-2 rounded">Kemaskini & Cetak</button>
+          <div class="mt-6">
+            <button id="updateRecordButton" class="bg-blue-500 text-white px-4 py-2 rounded">Kemaskini & Cetak Semula</button>
+          </div>
         </div>
       </div>
 
@@ -277,21 +274,21 @@
         <h3 class="text-xl font-bold mb-4">Laporan Kehilangan</h3>
         <div class="mb-4">
           <label for="searchLost" class="block text-sm font-medium">ID Kad / No. Kad Pengenalan</label>
-          <div class="flex">
-            <input type="text" id="searchLost" class="flex-1 p-2 border rounded">
+          <div class="flex items-center">
+            <input type="text" id="searchLost" class="w-full border rounded px-3 py-2">
             <button id="searchLostButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Cari</button>
           </div>
         </div>
-        <div id="lostInfo" class="hidden">
-          <h4 class="font-bold mb-2">Maklumat Kad</h4>
+        <div id="lostCardInfo" class="hidden">
+          <h4 class="text-lg font-semibold mb-2">Maklumat Kad</h4>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-2">
+            <div>
               <p><strong>ID Kad:</strong> <span id="lostUniqueId"></span></p>
               <p><strong>Nama:</strong> <span id="lostName"></span></p>
               <p><strong>No. Kad Pengenalan:</strong> <span id="lostIcNumber"></span></p>
               <p><strong>No. Telefon:</strong> <span id="lostPhone"></span></p>
             </div>
-            <div class="space-y-2">
+            <div>
               <p><strong>Jawatan:</strong> <span id="lostPosition"></span></p>
               <p><strong>Status:</strong> <span id="lostStatus"></span></p>
               <p><strong>Nama Waris:</strong> <span id="lostEmergencyContact"></span></p>
@@ -301,19 +298,19 @@
           <button id="reportLostButton" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Laporkan Hilang</button>
         </div>
         <div class="mt-6">
-          <h4 class="font-bold mb-2">Senarai Pendaftar</h4>
-          <table class="w-full border">
+          <h4 class="text-lg font-semibold mb-2">Senarai Pendaftar</h4>
+          <table id="registeredList" class="w-full border">
             <thead>
               <tr class="bg-gray-200">
-                <th class="p-2">Nama</th>
-                <th class="p-2">ID Kad</th>
-                <th class="p-2">Jabatan</th>
-                <th class="p-2">Jumlah Cetak</th>
-                <th class="p-2">Status</th>
-                <th class="p-2">Aksi</th>
+                <th class="border px-4 py-2">Nama</th>
+                <th class="border px-4 py-2">ID Kad</th>
+                <th class="border px-4 py-2">Jabatan</th>
+                <th class="border px-4 py-2">Jumlah Cetak</th>
+                <th class="border px-4 py-2">Status</th>
+                <th class="border px-4 py-2">Aksi</th>
               </tr>
             </thead>
-            <tbody id="registeredList"></tbody>
+            <tbody></tbody>
           </table>
         </div>
       </div>
@@ -322,19 +319,19 @@
       <div id="settingsSection" class="tab-content hidden">
         <h3 class="text-xl font-bold mb-4">Tetapan Sistem</h3>
         <div>
-          <h4 class="font-bold mb-2">Tukar Kata Laluan</h4>
+          <h4 class="text-lg font-semibold mb-2">Tukar Kata Laluan</h4>
           <div class="space-y-4">
             <div>
               <label for="currentPassword" class="block text-sm font-medium">Kata Laluan Semasa</label>
-              <input type="password" id="currentPassword" class="w-full p-2 border rounded">
+              <input type="password" id="currentPassword" class="w-full border rounded px-3 py-2 mt-1">
             </div>
             <div>
               <label for="newPassword" class="block text-sm font-medium">Kata Laluan Baru</label>
-              <input type="password" id="newPassword" class="w-full p-2 border rounded">
+              <input type="password" id="newPassword" class="w-full border rounded px-3 py-2 mt-1">
             </div>
             <div>
               <label for="confirmNewPassword" class="block text-sm font-medium">Sahkan Kata Laluan Baru</label>
-              <input type="password" id="confirmNewPassword" class="w-full p-2 border rounded">
+              <input type="password" id="confirmNewPassword" class="w-full border rounded px-3 py-2 mt-1">
             </div>
             <button id="changePasswordButton" class="bg-blue-500 text-white px-4 py-2 rounded">Tukar Kata Laluan</button>
           </div>
@@ -345,37 +342,36 @@
       <div id="previewSection" class="tab-content hidden">
         <h3 class="text-xl font-bold mb-4">Preview Kad Jabatan</h3>
         <div class="mb-4">
-          <label for="previewSearch" class="block text-sm font-medium">ID Kad / No. Kad Pengenalan</label>
-          <div class="flex">
-            <input type="text" id="previewSearch" class="flex-1 p-2 border rounded">
-            <button id="previewSearchButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Cari</button>
+          <div class="flex items-center">
+            <input type="text" id="searchPreview" class="w-full border rounded px-3 py-2">
+            <button id="searchPreviewButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Cari</button>
           </div>
         </div>
         <div id="previewContent" class="hidden">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 class="font-bold mb-2">Depan</h4>
-              <img id="frontPreview" class="w-full h-auto border rounded" src="" alt="Depan">
-              <button id="downloadFront" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Muat Turun Depan</button>
+              <h4 class="text-lg font-semibold mb-2">Depan</h4>
+              <iframe id="frontPreview" class="w-full h-64 border"></iframe>
+              <button id="downloadFrontButton" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Muat Turun Depan</button>
             </div>
             <div>
-              <h4 class="font-bold mb-2">Belakang</h4>
-              <img id="backPreview" class="w-full h-auto border rounded" src="" alt="Belakang">
-              <button id="downloadBack" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Muat Turun Belakang</button>
+              <h4 class="text-lg font-semibold mb-2">Belakang</h4>
+              <iframe id="backPreview" class="w-full h-64 border"></iframe>
+              <button id="downloadBackButton" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Muat Turun Belakang</button>
             </div>
           </div>
-          <button id="backToSearch" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded">Kembali</button>
         </div>
-        <div id="noCardFound" class="hidden mt-4 text-center">
+        <div id="noCardFound" class="hidden mt-4">
           <p class="text-red-500">Kad tidak ditemukan</p>
           <p>Sila cari menggunakan ID Kad atau daftar kad baru</p>
         </div>
+        <button id="backPreviewButton" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded">Kembali</button>
       </div>
     </div>
   </div>
 
   <!-- Footer -->
-  <footer class="bg-gray-800 text-white text-center p-4 mt-auto">
+  <footer class="bg-gray-800 text-white text-center py-4 mt-auto">
     <p>© 2025 Jabatan Imigresen Malaysia Negeri Sarawak. Hak Cipta Terpelihara. Disediakan oleh: PI KP2 (TBK1) Mohammad Azzer bin Taip. Unit Perancangan Strategik dan Khidmat Korporat.</p>
   </footer>
 
