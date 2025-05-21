@@ -1,79 +1,21 @@
-/* Modal Styles */
+/* Custom styles to complement Tailwind CSS */
 .modal {
-  display: none;
-}
-.modal.show {
-  display: flex;
-  z-index: 1000;
+  transition: opacity 0.3s ease-in-out;
 }
 
-/* Tab Content Styles */
 .tab-content {
   display: none;
 }
+
 .tab-content.active {
   display: block;
 }
 
-/* Table Styles */
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-th {
-  background-color: #e5e7eb;
-  font-weight: bold;
+.tab-button.active {
+  background-color: #3b82f6;
+  color: white;
 }
 
-/* Input and Button Enhancements */
-input, select, textarea {
-  transition: border-color 0.2s ease-in-out;
-}
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-/* File Input Styling */
-input[type="file"] {
-  padding: 0.5rem;
-}
-
-/* Responsive Image Preview */
-img {
+video, canvas {
   max-width: 100%;
-  height: auto;
-}
-
-/* Footer Styling */
-footer {
-  position: relative;
-  bottom: 0;
-  width: 100%;
-}
-
-/* Camera Modal */
-#video, #canvas {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Ensure form elements are consistent */
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
-  background-repeat: no-repeat;
-  background-position-x: 98%;
-  background-position-y: 50%;
 }
