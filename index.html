@@ -7,372 +7,572 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-  <!-- Loading Modal -->
-  <div id="loadingModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg">
-      <p>Memproses...</p>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-lg shadow-xl">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+      <p class="mt-4 text-center">Memproses...</p>
     </div>
   </div>
 
   <!-- Error Modal -->
-  <div id="errorModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg max-w-md">
-      <h3 class="text-lg font-bold mb-4">Ralat</h3>
-      <p id="errorMessage"></p>
-      <button id="closeErrorModal" class="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Tutup</button>
+  <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-red-600">Ralat</h3>
+        <button onclick="document.getElementById('errorModal').classList.add('hidden')" 
+                class="text-gray-500 hover:text-gray-700">×</button>
+      </div>
+      <p id="errorMessage" class="text-gray-700 mb-4"></p>
+      <button onclick="document.getElementById('errorModal').classList.add('hidden')" 
+              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Tutup</button>
     </div>
   </div>
 
   <!-- Success Modal -->
-  <div id="successModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg max-w-md">
-      <h3 class="text-lg font-bold mb-4">Pemberitahuan</h3>
-      <p id="successMessage"></p>
-      <button id="closeSuccessModal" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Tutup</button>
+  <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-green-600">Pemberitahuan</h3>
+        <button onclick="document.getElementById('successModal').classList.add('hidden')" 
+                class="text-gray-500 hover:text-gray-700">×</button>
+      </div>
+      <p id="successMessage" class="text-gray-700 mb-4"></p>
+      <button onclick="document.getElementById('successModal').classList.add('hidden')" 
+              class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Tutup</button>
     </div>
   </div>
 
-  <!-- Confirmation Modal -->
-  <div id="confirmationModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg max-w-md">
-      <h3 class="text-lg font-bold mb-4">Pengesahan</h3>
-      <p id="confirmationMessage"></p>
-      <div class="mt-4 flex justify-end space-x-2">
-        <button id="cancelConfirmation" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Batal</button>
-        <button id="confirmConfirmation" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Ya</button>
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-blue-600">Pengesahan</h3>
+        <button onclick="document.getElementById('confirmModal').classList.add('hidden')" 
+                class="text-gray-500 hover:text-gray-700">×</button>
+      </div>
+      <p id="confirmMessage" class="text-gray-700 mb-4"></p>
+      <div class="flex justify-end space-x-4">
+        <button onclick="document.getElementById('confirmModal').classList.add('hidden')" 
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Batal</button>
+        <button id="confirmYesButton" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ya</button>
       </div>
     </div>
   </div>
 
-  <!-- Login Section -->
-  <div id="loginSection" class="flex-1 flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-      <img src="https://ik.imagekit.io/pyreotmgq/Immigration_Department_of_Malaysia_Logo.svg.png?updatedAt=1744170604496" alt="Logo Imigresen" class="h-20 mx-auto">
-      <h1 class="text-2xl font-bold text-center mb-2">Sistem Pendaftaran Kad Jabatan</h1>
-      <h2 class="text-lg text-center mb-6">Jabatan Imigresen Malaysia Negeri Sarawak</h2>
-      <div class="space-y-4">
-        <div>
-          <label for="username" class="block text-sm font-medium">No. Kad Pengenalan</label>
-          <input type="text" id="username" class="w-full border rounded px-3 py-2 mt-1">
-        </div>
-        <div>
-          <label for="password" class="block text-sm font-medium">Kata Laluan</label>
-          <input type="password" id="password" class="w-full border rounded px-3 py-2 mt-1">
-        </div>
-        <button id="loginButton" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Log Masuk</button>
+  <!-- Login Page -->
+  <div id="loginPage" class="container mx-auto px-4 py-8 max-w-md">
+    <div class="bg-white rounded-xl shadow-md overflow-hidden p-8">
+      <div class="text-center mb-8">
+        <img src="https://ik.imagekit.io/pyreotmgq/Immigration_Department_of_Malaysia_Logo.svg.png?updatedAt=1744170604496" alt="Logo Imigresen" class="h-20 mx-auto">
+        <h1 class="text-2xl font-bold text-gray-800 mt-4">Sistem Pendaftaran Kad Jabatan</h1>
+        <p class="text-gray-600">Jabatan Imigresen Malaysia Negeri Sarawak</p>
       </div>
+      
+      <form id="loginForm" class="space-y-6">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
+          <input type="text" id="username" name="username" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+        </div>
+        
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Kata Laluan</label>
+          <input type="password" id="password" name="password" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+        </div>
+        
+        <div>
+          <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fas fa-sign-in-alt mr-2"></i> Log Masuk
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Main Section (Hidden Initially) -->
-  <div id="mainSection" class="hidden flex-1">
-    <div class="container mx-auto p-4">
-      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h1 class="text-2xl font-bold text-center mb-2">Sistem Pendaftaran Kad Jabatan</h1>
-        <h2 class="text-lg text-center mb-6">Jabatan Imigresen Malaysia Negeri Sarawak</h2>
-        <nav class="flex justify-center space-x-4">
-          <button id="registerTab" class="tab-button bg-blue-500 text-white px-4 py-2 rounded">Daftar</button>
-          <button id="updateTab" class="tab-button bg-gray-300 text-black px-4 py-2 rounded">Kemaskini</button>
-          <button id="lostTab" class="tab-button bg-gray-300 text-black px-4 py-2 rounded">Kehilangan</button>
-          <button id="settingsTab" class="tab-button bg-gray-300 text-black px-4 py-2 rounded">Tetapan</button>
-          <button id="previewTab" class="tab-button bg-gray-300 text-black px-4 py-2 rounded">Preview</button>
-          <button id="logoutButton" class="tab-button bg-red-500 text-white px-4 py-2 rounded">Log Keluar</button>
+  <!-- Main Page -->
+  <div id="mainPage" class="container mx-auto px-4 py-8 hidden flex-grow">
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <!-- Header -->
+      <div class="bg-blue-600 px-6 py-4 flex items-center">
+        <img src="https://ik.imagekit.io/pyreotmgq/Immigration_Department_of_Malaysia_Logo.svg.png?updatedAt=1744170604496" alt="Logo Imigresen" class="h-12 mr-4">
+        <div class="flex-1">
+          <h1 class="text-xl font-bold text-white">Sistem Pendaftaran Kad Jabatan</h1>
+          <p class="text-blue-100">Jabatan Imigresen Malaysia Negeri Sarawak</p>
+        </div>
+        <div class="text-right text-white">
+          <p id="currentDate" class="font-medium"></p>
+          <p id="currentTime" class="text-sm"></p>
+          <p id="adminName" class="text-sm font-medium"></p>
+        </div>
+      </div>
+      
+      <!-- Tabs Navigation -->
+      <div class="border-b border-gray-200">
+        <nav class="flex -mb-px">
+          <button onclick="openTab('daftar')" class="tab-button active py-4 px-6 text-center border-b-2 font-medium text-sm border-blue-500 text-blue-600">
+            <i class="fas fa-user-plus mr-2"></i>Daftar
+          </button>
+          <button onclick="openTab('kemaskini')" class="tab-button py-4 px-6 text-center border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <i class="fas fa-edit mr-2"></i>Kemaskini
+          </button>
+          <button onclick="openTab('kehilangan')" class="tab-button py-4 px-6 text-center border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <i class="fas fa-search mr-2"></i>Kehilangan
+          </button>
+          <button onclick="openTab('tetapan')" class="tab-button py-4 px-6 text-center border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <i class="fas fa-cog mr-2"></i>Tetapan
+          </button>
+          <button onclick="openTab('preview')" class="tab-button py-4 px-6 text-center border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-.youtube hover:border-gray-300">
+            <i class="fas fa-id-card mr-2"></i>Preview
+          </button>
+          <button onclick="logout()" class="ml-auto py-4 px-6 text-center text-sm font-medium text-red-600 hover:text-red-800">
+            <i class="fas fa-sign-out-alt mr-2"></i>Log Keluar
+          </button>
         </nav>
       </div>
-
-      <!-- Registration Section -->
-      <div id="registerSection" class="tab-content">
-        <h3 class="text-xl font-bold mb-4">Pendaftaran Baru</h3>
+      
+      <!-- Tab Contents -->
+      <div class="p-6">
+        <!-- Registration Tab -->
+        <div id="daftar" class="tab-content active">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">Pendaftaran Baru</h2>
+          <form id="registrationForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Kolom 1 -->
+              <div class="space-y-4">
+                <h3 class="font-medium text-gray-700 border-b pb-2">Maklumat Asas</h3>
+                
+                <div>
+                  <label for="uniqueId" class="block text-sm font-medium text-gray-700">ID Kad</label>
+                  <div class="mt-1 flex rounded-md shadow-sm">
+                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                      JIMSWK
+                    </span>
+                    <input type="text" id="uniqueIdNumber" name="uniqueIdNumber" 
+                          class="flex-1 min-w-0 block w-full rounded-none rounded-r-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                          placeholder="4 digit nombor (cth: 0001)" pattern="\d{4}" maxlength="4">
+                    <button type="button" onclick="checkIdAvailability()" class="ml-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                      Semak
+                    </button>
+                  </div>
+                  <input type="hidden" id="uniqueId" name="uniqueId">
+                  <p id="idAvailabilityMessage" class="mt-1 text-sm"></p>
+                </div>
+                
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700">Nama Penuh</label>
+                  <input type="text" id="name" name="name" required
+                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                </div>
+                
+                <div id="displayNameContainer" class="hidden">
+                  <label for="displayName" class="block text-sm font-medium text-gray-700">Nama untuk Kad</label>
+                  <select id="displayName" name="displayName" required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    <option value="">Pilih Nama</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="icNumber" class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
+                  <input type="text" id="icNumber" name="icNumber" required
+                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                         pattern="[0-9]{6}-[0-9]{2}-[0-9]{4}" placeholder="Contoh: 123456-78-9012">
+                </div>
+                
+                <div>
+                  <label for="phone" class="block text-sm font-medium text-gray-700">No. Telefon</label>
+                  <input type="tel" id="phone" name="phone" required
+                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                         pattern="[0-9]{10,11}" placeholder="Contoh: 0123456789">
+                </div>
+              </div>
+              
+              <!-- Kolom 2 -->
+              <div class="space-y-4">
+                <h3 class="font-medium text-gray-700 border-b pb-2">Maklumat Tambahan</h3>
+                
+                <div>
+                  <label for="position" class="block text-sm font-medium text-gray-700">Jawatan</label>
+                  <select id="position" name="position" required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    <option value="">Pilih Jawatan</option>
+                    <option value="Pengarah Imigresen Negeri">Pengarah Imigresen Negeri</option>
+                    <option value="Timbalan Pengarah Imigresen Negeri (Pentadbiran)">Timbalan Pengarah Imigresen Negeri (Pentadbiran)</option>
+                    <option value="Timbalan Pengarah Imigrsen Negeri (Kawalan)">Timbalan Pengarah Imigresen Negeri (Kawalan)</option>
+                    <option value="Penolong Penguasa Imigresen Kanan">Penolong Pengarah Imigresen Kanan</option>
+                    <option value="Penolong Penguasa Imigresen">Penolong Pengarah Imigresen</option>
+                    <option value="Ketua Timbalan Penolong Pengarah Imigresen">Ketua Timbalan Penolong Pengarah Imigresen</option>
+                    <option value="Timbalan Penolong Pengarah Imigresen Kanan">Timbalan Penolong Pengarah Imigresen Kanan</option>
+                    <option value="Timbalan Penolong Pengarah Imigresen">Timbalan Penolong Pengarah Imigresen</option>
+                    <option value="Ketua Pegawai Imigresen Tinggi">Ketua Pegawai Imigresen Tinggi</option>
+                    <option value="Pegawai Imigresen Tinggi">Pegawai Imigresen Tinggi</option>
+                    <option value="Pegawai Imigresen Kanan">Pegawai Imigresen Kanan</option>
+                    <option value="Pegawai Imigresen">Pegawai Imigresen</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                  <input type="text" id="status" name="status"
+                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                </div>
+                
+                <div>
+                  <label for="emergencyContact" class="block text-sm font-medium text-gray-700">Nama Waris</label>
+                  <input type="text" id="emergencyContact" name="emergencyContact"
+                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                </div>
+                
+                <div>
+                  <label for="emergencyPhone" class="block text-sm font-medium text-gray-700">No. Telefon Waris</label>
+                  <input type="tel" id="emergencyPhone" name="emergencyPhone"
+                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                         pattern="[0-9]{10,11}" placeholder="Contoh: 0123456789">
+                </div>
+              </div>
+            </div>
+            
+            <!-- Kolom Bawah -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="medicalCondition" class="block text-sm font-medium text-gray-700">Penyakit (Jika ada)</label>
+                <textarea id="medicalCondition" name="medicalCondition" rows="3"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"></textarea>
+              </div>
+              
+              <div>
+                <label for="photo" class="block text-sm font-medium text-gray-700">Foto (Latar Belakang Putih)</label>
+                <div class="mt-1 flex items-center space-x-4">
+                  <input type="file" id="photo" name="photo" accept="image/*"
+                         class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                  <button type="button" id="capturePhoto" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    <i class="fas fa-camera mr-2"></i> Ambil Gambar
+                  </button>
+                </div>
+                <p class="mt-2 text-sm text-gray-500">Format: JPEG/PNG, Maksimum 2MB</p>
+                <canvas id="photoCanvas" style="display: none;"></canvas>
+                <div id="cameraModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                  <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                    <div class="flex justify-between items-center mb-4">
+                      <h3 class="text-lg font-bold text-blue-600">Ambil Gambar</h3>
+                      <button onclick="stopCamera()" class="text-gray-500 hover:text-gray-700">×</button>
+                    </div>
+                    <video id="cameraFeed" autoplay class="w-full h-64"></video>
+                    <div class="mt-4 flex justify-end space-x-4">
+                      <button onclick="captureImage()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Tangkap</button>
+                      <button onclick="stopCamera()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Batal</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-4 flex space-x-4">
+              <button type="submit" class="w-full md:w-auto px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <i class="fas fa-save mr-2"></i> Simpan Pendaftaran
+              </button>
+              <button type="button" id="resetButton" onclick="resetRegistrationForm()" class="w-full md:w-auto px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 hidden">
+                <i class="fas fa-undo mr-2"></i> Reset
+              </button>
+            </div>
+          </form>
+        </div>
+        
+<!-- Update Tab -->
+<div id="kemaskini" class="tab-content hidden">
+  <h2 class="text-lg font-medium text-gray-900 mb-4">Kemaskini Maklumat</h2>
+  <div class="space-y-4">
+    <div class="flex items-end gap-4">
+      <div class="flex-1">
+        <label for="updateSearch" class="block text-sm font-medium text-gray-700">ID Kad / No. Kad Pengenalan</label>
+        <input type="text" id="updateSearch" placeholder="Cari ID atau No. K/P"
+               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+      </div>
+      <button onclick="searchForUpdate()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        <i class="fas fa-search mr-2"></i>Cari
+      </button>
+    </div>
+    
+    <div id="updateForm" class="hidden bg-gray-50 p-4 rounded-lg">
+      <form id="updateFormElement" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Kolom 1 -->
+          <div class="space-y-4">
+            <h3 class="font-medium text-gray-700 border-b pb-2">Maklumat Asas</h3>
+            
+            <div>
+              <label for="updateUniqueId" class="block text-sm font-medium text-gray-700">ID Kad</label>
+              <input type="text" id="updateUniqueId" readonly
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-gray-100">
+            </div>
+            
+            <div>
+              <label for="updateName" class="block text-sm font-medium text-gray-700">Nama Penuh</label>
+              <input type="text" id="updateName" name="name" required
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+            </div>
+            
+            <div>
+              <label for="updateDisplayName" class="block text-sm font-medium text-gray-700">Nama untuk Kad</label>
+              <select id="updateDisplayName" name="displayName" required
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                <option value="">Pilih Nama</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="updateIcNumber" class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
+              <input type="text" id="updateIcNumber" name="icNumber" required
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                     pattern="[0-9]{6}-[0-9]{2}-[0-9]{4}">
+            </div>
+            
+            <div>
+              <label for="updatePhone" class="block text-sm font-medium text-gray-700">No. Telefon</label>
+              <input type="tel" id="updatePhone" name="phone" required
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                     pattern="[0-9]{10,11}">
+            </div>
+          </div>
+          
+          <!-- Kolom 2 -->
+          <div class="space-y-4">
+            <h3 class="font-medium text-gray-700 border-b pb-2">Maklumat Tambahan</h3>
+            
+            <div>
+              <label for="updatePosition" class="block text-sm font-medium text-gray-700">Jawatan</label>
+              <select id="updatePosition" name="position" required
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                <option value="">Pilih Jawatan</option>
+                <option value="Pengarah Imigresen Negeri">Pengarah Imigresen Negeri</option>
+                <option value="Timbalan Pengarah Imigresen Negeri (Pentadbiran)">Timbalan Pengarah Imigresen Negeri (Pentadbiran)</option>
+                <option value="Timbalan Pengarah Imigresen Negeri (Kawalan)">Timbalan Pengarah Imigresen Negeri (Kawalan)</option>
+                <option value="Penolong Pengarah Imigresen Kanan">Penolong Pengarah Imigresen Kanan</option>
+                <option value="Penolong Pengarah Imigresen">Penolong Pengarah Imigresen</option>
+                <option value="Ketua Timbalan Penolong Pengarah Imigresen">Ketua Timbalan Penolong Pengarah Imigresen</option>
+                <option value="Timbalan Penolong Pengarah Imigresen Kanan">Timbalan Penolong Pengarah Imigresen Kanan</option>
+                <option value="Timbalan Penolong Pengarah Imigresen">Timbalan Penolong Pengarah Imigresen</option>
+                <option value="Ketua Pegawai Imigresen Tinggi">Ketua Pegawai Imigresen Tinggi</option>
+                <option value="Pegawai Imigresen Tinggi">Pegawai Imigresen Tinggi</option>
+                <option value="Pegawai Imigresen Kanan">Pegawai Imigresen Kanan</option>
+                <option value="Pegawai Imigresen">Pegawai Imigresen</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="updateStatus" class="block text-sm font-medium text-gray-700">Status</label>
+              <input type="text" id="updateStatus" name="status"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+            </div>
+            
+            <div>
+              <label for="updateEmergencyContact" class="block text-sm font-medium text-gray-700">Nama Waris</label>
+              <input type="text" id="updateEmergencyContact" name="emergencyContact"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+            </div>
+            
+            <div>
+              <label for="updateEmergencyPhone" class="block text-sm font-medium text-gray-700">No. Telefon Waris</label>
+              <input type="tel" id="updateEmergencyPhone" name="emergencyPhone"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                     pattern="[0-9]{10,11}">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Kolom Bawah -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 class="text-lg font-semibold mb-2">Maklumat Asas</h4>
-            <div class="space-y-4">
-              <div>
-                <label for="uniqueId" class="block text-sm font-medium">ID Kad</label>
-                <div class="flex items-center">
-                  <span class="border rounded-l px-3 py-2 bg-gray-200">JIMSWK</span>
-                  <input type="text" id="uniqueId" class="border rounded-r px-3 py-2 flex-1">
-                  <button id="checkIdButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Semak</button>
-                </div>
-                <p id="idAvailability" class="text-sm text-gray-500 mt-1"></p>
-              </div>
-              <div>
-                <label for="name" class="block text-sm font-medium">Nama Penuh</label>
-                <input type="text" id="name" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="displayName" class="block text-sm font-medium">Nama untuk Kad</label>
-                <select id="displayName" class="w-full border rounded px-3 py-2 mt-1">
-                  <option value="">Pilih Nama</option>
-                </select>
-              </div>
-              <div>
-                <label for="icNumber" class="block text-sm font-medium">No. Kad Pengenalan</label>
-                <input type="text" id="icNumber" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="phone" class="block text-sm font-medium">No. Telefon</label>
-                <input type="text" id="phone" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-            </div>
+            <label for="updateMedicalCondition" class="block text-sm font-medium text-gray-700">Penyakit (Jika ada)</label>
+            <textarea id="updateMedicalCondition" name="medicalCondition" rows="3"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"></textarea>
           </div>
+          
           <div>
-            <h4 class="text-lg font-semibold mb-2">Maklumat Tambahan</h4>
-            <div class="space-y-4">
-              <div>
-                <label for="position" class="block text-sm font-medium">Jawatan</label>
-                <select id="position" class="w-full border rounded px-3 py-2 mt-1">
-                  <option value="">Pilih Jawatan</option>
-                  <option value="Pengarah Imigresen Negeri">Pengarah Imigresen Negeri</option>
-                  <option value="Timbalan Pengarah Imigresen Negeri (Pentadbiran)">Timbalan Pengarah Imigresen Negeri (Pentadbiran)</option>
-                  <option value="Timbalan Pengarah Imigresen Negeri (Kawalan)">Timbalan Pengarah Imigresen Negeri (Kawalan)</option>
-                  <option value="Penolong Pengarah Imigresen Kanan">Penolong Pengarah Imigresen Kanan</option>
-                  <option value="Penolong Pengarah Imigresen">Penolong Pengarah Imigresen</option>
-                  <option value="Ketua Timbalan Penolong Pengarah Imigresen">Ketua Timbalan Penolong Pengarah Imigresen</option>
-                  <option value="Timbalan Penolong Pengarah Imigresen Kanan">Timbalan Penolong Pengarah Imigresen Kanan</option>
-                  <option value="Timbalan Penolong Pengarah Imigresen">Timbalan Penolong Pengarah Imigresen</option>
-                  <option value="Ketua Pegawai Imigresen Tinggi">Ketua Pegawai Imigresen Tinggi</option>
-                  <option value="Pegawai Imigresen Tinggi">Pegawai Imigresen Tinggi</option>
-                  <option value="Pegawai Imigresen Kanan">Pegawai Imigresen Kanan</option>
-                  <option value="Pegawai Imigresen">Pegawai Imigresen</option>
-                </select>
-              </div>
-              <div>
-                <label for="status" class="block text-sm font-medium">Status</label>
-                <input type="text" id="status" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="emergencyContact" class="block text-sm font-medium">Nama Waris</label>
-                <input type="text" id="emergencyContact" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="emergencyPhone" class="block text-sm font-medium">No. Telefon Waris</label>
-                <input type="text" id="emergencyPhone" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
+            <label class="block text-sm font-medium text-gray-700">Gambar Lama</label>
+            <img id="oldPhotoPreview" style="display: none; max-width: 200px; margin-top: 10px; margin-bottom: 10px;" alt="Gambar Lama">
+            
+            <label for="updatePhoto" class="block text-sm font-medium text-gray-700">Foto Baru (Latar Belakang Putih)</label>
+            <div class="mt-1 flex items-center space-x-4">
+              <input type="file" id="updatePhoto" name="photo" accept="image/*"
+                     class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+              <button type="button" id="updateCapturePhoto" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <i class="fas fa-camera mr-2"></i> Ambil Gambar
+              </button>
             </div>
+            <p class="mt-2 text-sm text-gray-500">Format: JPEG/PNG, Maksimum 2MB</p>
+            <canvas id="updatePhotoCanvas" style="display: none;"></canvas>
           </div>
         </div>
-        <div class="mt-6">
-          <label for="medicalCondition" class="block text-sm font-medium">Penyakit (Jika ada)</label>
-          <textarea id="medicalCondition" class="w-full border rounded px-3 py-2 mt-1"></textarea>
+        
+        <!-- Gantikan butang dengan satu butang sahaja -->
+        <div class="pt-4 flex space-x-4">
+          <button type="button" onclick="updateRecordAndReprint()" class="w-full md:w-auto px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fas fa-save mr-2"></i> Kemaskini & Cetak Semula
+          </button>
         </div>
-        <div class="mt-4">
-          <label for="photo" class="block text-sm font-medium">Foto (Latar Belakang Putih)</label>
-          <input type="file" id="photo" accept="image/jpeg,image/png" class="w-full border rounded px-3 py-2 mt-1">
-          <button id="capturePhotoButton" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Ambil Gambar</button>
-          <p class="text-sm text-gray-500 mt-1">Format: JPEG/PNG, Maksimum 2MB</p>
-        </div>
-        <div id="cameraModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-white p-6 rounded-lg">
-            <video id="video" class="w-full max-w-md" autoplay></video>
-            <canvas id="canvas" class="hidden"></canvas>
-            <div class="mt-4 flex justify-end space-x-2">
-              <button id="captureButton" class="bg-blue-500 text-white px-4 py-2 rounded">Tangkap</button>
-              <button id="cancelCapture" class="bg-gray-500 text-white px-4 py-2 rounded">Batal</button>
-            </div>
-          </div>
-        </div>
-        <div class="mt-6 flex space-x-4">
-          <button id="saveRegistrationButton" class="bg-blue-500 text-white px-4 py-2 rounded">Simpan Pendaftaran</button>
-          <button id="resetRegistrationButton" class="bg-gray-500 text-white px-4 py-2 rounded">Reset</button>
-        </div>
-      </div>
-
-      <!-- Update Section -->
-      <div id="updateSection" class="tab-content hidden">
-        <h3 class="text-xl font-bold mb-4">Kemaskini Maklumat</h3>
-        <div class="mb-4">
-          <label for="searchUpdate" class="block text-sm font-medium">ID Kad / No. Kad Pengenalan</label>
-          <div class="flex items-center">
-            <input type="text" id="searchUpdate" class="w-full border rounded px-3 py-2">
-            <button id="searchUpdateButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Cari</button>
-          </div>
-        </div>
-        <div id="updateForm" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h4 class="text-lg font-semibold mb-2">Maklumat Asas</h4>
-            <div class="space-y-4">
-              <div>
-                <label for="updateUniqueId" class="block text-sm font-medium">ID Kad</label>
-                <input type="text" id="updateUniqueId" class="w-full border rounded px-3 py-2 mt-1" readonly>
-              </div>
-              <div>
-                <label for="updateName" class="block text-sm font-medium">Nama Penuh</label>
-                <input type="text" id="updateName" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="updateDisplayName" class="block text-sm font-medium">Nama untuk Kad</label>
-                <select id="updateDisplayName" class="w-full border rounded px-3 py-2 mt-1">
-                  <option value="">Pilih Nama</option>
-                </select>
-              </div>
-              <div>
-                <label for="updateIcNumber" class="block text-sm font-medium">No. Kad Pengenalan</label>
-                <input type="text" id="updateIcNumber" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="updatePhone" class="block text-sm font-medium">No. Telefon</label>
-                <input type="text" id="updatePhone" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-            </div>
-          </div>
-          <div>
-            <h4 class="text-lg font-semibold mb-2">Maklumat Tambahan</h4>
-            <div class="space-y-4">
-              <div>
-                <label for="updatePosition" class="block text-sm font-medium">Jawatan</label>
-                <select id="updatePosition" class="w-full border rounded px-3 py-2 mt-1">
-                  <option value="">Pilih Jawatan</option>
-                  <option value="Pengarah Imigresen Negeri">Pengarah Imigresen Negeri</option>
-                  <option value="Timbalan Pengarah Imigresen Negeri (Pentadbiran)">Timbalan Pengarah Imigresen Negeri (Pentadbiran)</option>
-                  <option value="Timbalan Pengarah Imigresen Negeri (Kawalan)">Timbalan Pengarah Imigresen Negeri (Kawalan)</option>
-                  <option value="Penolong Pengarah Imigresen Kanan">Penolong Pengarah Imigresen Kanan</option>
-                  <option value="Penolong Pengarah Imigresen">Penolong Pengarah Imigresen</option>
-                  <option value="Ketua Timbalan Penolong Pengarah Imigresen">Ketua Timbalan Penolong Pengarah Imigresen</option>
-                  <option value="Timbalan Penolong Pengarah Imigresen Kanan">Timbalan Penolong Pengarah Imigresen Kanan</option>
-                  <option value="Timbalan Penolong Pengarah Imigresen">Timbalan Penolong Pengarah Imigresen</option>
-                  <option value="Ketua Pegawai Imigresen Tinggi">Ketua Pegawai Imigresen Tinggi</option>
-                  <option value="Pegawai Imigresen Tinggi">Pegawai Imigresen Tinggi</option>
-                  <option value="Pegawai Imigresen Kanan">Pegawai Imigresen Kanan</option>
-                  <option value="Pegawai Imigresen">Pegawai Imigresen</option>
-                </select>
-              </div>
-              <div>
-                <label for="updateStatus" class="block text-sm font-medium">Status</label>
-                <input type="text" id="updateStatus" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="updateEmergencyContact" class="block text-sm font-medium">Nama Waris</label>
-                <input type="text" id="updateEmergencyContact" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="updateEmergencyPhone" class="block text-sm font-medium">No. Telefon Waris</label>
-                <input type="text" id="updateEmergencyPhone" class="w-full border rounded px-3 py-2 mt-1">
-              </div>
-            </div>
-          </div>
-          <div class="mt-6">
-            <label for="updateMedicalCondition" class="block text-sm font-medium">Penyakit (Jika ada)</label>
-            <textarea id="updateMedicalCondition" class="w-full border rounded px-3 py-2 mt-1"></textarea>
-          </div>
-          <div class="mt-4">
-            <label class="block text-sm font-medium">Gambar Lama</label>
-            <img id="updatePhotoPreview" class="w-32 h-32 object-cover border rounded mt-1">
-            <label for="updatePhoto" class="block text-sm font-medium mt-4">Foto Baru (Latar Belakang Putih)</label>
-            <input type="file" id="updatePhoto" accept="image/jpeg,image/png" class="w-full border rounded px-3 py-2 mt-1">
-            <button id="updateCapturePhotoButton" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Ambil Gambar</button>
-            <p class="text-sm text-gray-500 mt-1">Format: JPEG/PNG, Maksimum 2MB</p>
-          </div>
-          <div class="mt-6">
-            <button id="updateRecordButton" class="bg-blue-500 text-white px-4 py-2 rounded">Kemaskini & Cetak Semula</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Lost Card Section -->
-      <div id="lostSection" class="tab-content hidden">
-        <h3 class="text-xl font-bold mb-4">Laporan Kehilangan</h3>
-        <div class="mb-4">
-          <label for="searchLost" class="block text-sm font-medium">ID Kad / No. Kad Pengenalan</label>
-          <div class="flex items-center">
-            <input type="text" id="searchLost" class="w-full border rounded px-3 py-2">
-            <button id="searchLostButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Cari</button>
-          </div>
-        </div>
-        <div id="lostCardInfo" class="hidden">
-          <h4 class="text-lg font-semibold mb-2">Maklumat Kad</h4>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p><strong>ID Kad:</strong> <span id="lostUniqueId"></span></p>
-              <p><strong>Nama:</strong> <span id="lostName"></span></p>
-              <p><strong>No. Kad Pengenalan:</strong> <span id="lostIcNumber"></span></p>
-              <p><strong>No. Telefon:</strong> <span id="lostPhone"></span></p>
-            </div>
-            <div>
-              <p><strong>Jawatan:</strong> <span id="lostPosition"></span></p>
-              <p><strong>Status:</strong> <span id="lostStatus"></span></p>
-              <p><strong>Nama Waris:</strong> <span id="lostEmergencyContact"></span></p>
-              <p><strong>No. Telefon Waris:</strong> <span id="lostEmergencyPhone"></span></p>
-            </div>
-          </div>
-          <button id="reportLostButton" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Laporkan Hilang</button>
-        </div>
-        <div class="mt-6">
-          <h4 class="text-lg font-semibold mb-2">Senarai Pendaftar</h4>
-          <table id="registeredList" class="w-full border">
-            <thead>
-              <tr class="bg-gray-200">
-                <th class="border px-4 py-2">Nama</th>
-                <th class="border px-4 py-2">ID Kad</th>
-                <th class="border px-4 py-2">Jabatan</th>
-                <th class="border px-4 py-2">Jumlah Cetak</th>
-                <th class="border px-4 py-2">Status</th>
-                <th class="border px-4 py-2">Aksi</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Settings Section -->
-      <div id="settingsSection" class="tab-content hidden">
-        <h3 class="text-xl font-bold mb-4">Tetapan Sistem</h3>
-        <div>
-          <h4 class="text-lg font-semibold mb-2">Tukar Kata Laluan</h4>
+      </form>
+    </div>
+  </div>
+</div>
+        
+        <!-- Lost Report Tab -->
+        <div id="kehilangan" class="tab-content hidden">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">Laporan Kehilangan</h2>
           <div class="space-y-4">
-            <div>
-              <label for="currentPassword" class="block text-sm font-medium">Kata Laluan Semasa</label>
-              <input type="password" id="currentPassword" class="w-full border rounded px-3 py-2 mt-1">
+            <div class="flex items-end gap-4">
+              <div class="flex-1">
+                <label for="lostSearch" class="block text-sm font-medium text-gray-700">ID Kad / No. Kad Pengenalan</label>
+                <input type="text" id="lostSearch" placeholder="Cari ID atau No. K/P"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+              </div>
+              <button onclick="searchForLost()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <i class="fas fa-search mr-2"></i>Cari
+              </button>
             </div>
-            <div>
-              <label for="newPassword" class="block text-sm font-medium">Kata Laluan Baru</label>
-              <input type="password" id="newPassword" class="w-full border rounded px-3 py-2 mt-1">
-            </div>
-            <div>
-              <label for="confirmNewPassword" class="block text-sm font-medium">Sahkan Kata Laluan Baru</label>
-              <input type="password" id="confirmNewPassword" class="w-full border rounded px-3 py-2 mt-1">
-            </div>
-            <button id="changePasswordButton" class="bg-blue-500 text-white px-4 py-2 rounded">Tukar Kata Laluan</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Preview Section -->
-      <div id="previewSection" class="tab-content hidden">
-        <h3 class="text-xl font-bold mb-4">Preview Kad Jabatan</h3>
-        <div class="mb-4">
-          <div class="flex items-center">
-            <input type="text" id="searchPreview" class="w-full border rounded px-3 py-2">
-            <button id="searchPreviewButton" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded">Cari</button>
-          </div>
-        </div>
-        <div id="previewContent" class="hidden">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 class="text-lg font-semibold mb-2">Depan</h4>
-              <iframe id="frontPreview" class="w-full h-64 border"></iframe>
-              <button id="downloadFrontButton" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Muat Turun Depan</button>
-            </div>
-            <div>
-              <h4 class="text-lg font-semibold mb-2">Belakang</h4>
-              <iframe id="backPreview" class="w-full h-64 border"></iframe>
-              <button id="downloadBackButton" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Muat Turun Belakang</button>
+            
+            <div id="lostResult" class="hidden bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-medium text-gray-700 border-b pb-2 mb-4">Maklumat Kad</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p><strong>ID Kad:</strong> <span id="lostUniqueId"></span></p>
+                  <p><strong>Nama:</strong> <span id="lostName"></span></p>
+                  <p><strong>No. Kad Pengenalan:</strong> <span id="lostIcNumber"></span></p>
+                  <p><strong>No. Telefon:</strong> <span id="lostPhone"></span></p>
+                </div>
+                <div>
+                  <p><strong>Jawatan:</strong> <span id="lostPosition"></span></p>
+                  <p><strong>Status:</strong> <span id="lostStatus"></span></p>
+                  <p><strong>Nama Waris:</strong> <span id="lostEmergencyContact"></span></p>
+                  <p><strong>No. Telefon Waris:</strong> <span id="lostEmergencyPhone"></span></p>
+                </div>
+              </div>
+              <div class="mt-4">
+                <button id="reportLostButton" onclick="showConfirmLost(document.getElementById('lostUniqueId').textContent)" 
+                        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                  <i class="fas fa-exclamation-triangle mr-2"></i>Laporkan Hilang
+                </button>
+              </div>
             </div>
           </div>
+          
+          <div class="mt-8 overflow-x-auto">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Senarai Pendaftar</h3>
+            <table id="registeredList" class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Kad</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Cetak</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200" id="registeredListBody">
+                <!-- Data akan diisi oleh JavaScript -->
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div id="noCardFound" class="hidden mt-4">
-          <p class="text-red-500">Kad tidak ditemukan</p>
-          <p>Sila cari menggunakan ID Kad atau daftar kad baru</p>
+        
+        <!-- Settings Tab -->
+        <div id="tetapan" class="tab-content hidden">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">Tetapan Sistem</h2>
+          <div class="bg-gray-50 p-6 rounded-lg max-w-md">
+            <h3 class="font-medium text-gray-700 border-b pb-2 mb-4">Tukar Kata Laluan</h3>
+            <form id="changePasswordForm" class="space-y-4">
+              <div>
+                <label for="currentPassword" class="block text-sm font-medium text-gray-700">Kata Laluan Semasa</label>
+                <input type="password" id="currentPassword" name="currentPassword" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+              </div>
+              <div>
+                <label for="newPassword" class="block text-sm font-medium text-gray-700">Kata Laluan Baru</label>
+                <input type="password" id="newPassword" name="newPassword" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+              </div>
+              <div>
+                <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Sahkan Kata Laluan Baru</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+              </div>
+              <div class="pt-2">
+                <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <i class="fas fa-key mr-2"></i> Tukar Kata Laluan
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        <button id="backPreviewButton" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded">Kembali</button>
+        
+        <!-- Preview Tab -->
+        <div id="preview" class="tab-content hidden">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+              <h1 class="text-2xl font-bold text-gray-800">
+                <i class="fas fa-id-card mr-2 text-blue-600"></i> Preview Kad Jabatan
+              </h1>
+              <div class="flex items-center space-x-4">
+                <div class="relative">
+                  <input type="text" id="previewSearch" placeholder="Cari ID Kad" 
+                        class="pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <span id="uniqueIdDisplay" class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"></span>
+              </div>
+            </div>
+            
+            <div id="previewCardContainer" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <!-- Front Card -->
+              <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                <h2 class="text-lg font-medium text-gray-700 mb-4 flex items-center">
+                  <i class="fas fa-id-card-alt mr-2 text-blue-500"></i> Depan
+                </h2>
+                <iframe id="frontCardIframe" class="w-full h-96 border" style="width: 54mm; height: 85mm;"></iframe>
+                <div class="flex justify-center mt-4">
+                  <button onclick="downloadPdf('front')" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    Muat Turun Depan
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Back Card -->
+              <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                <h2 class="text-lg font-medium text-gray-700 mb-4 flex items-center">
+                  <i class="fas fa-id-card-alt mr-2 text-blue-500"></i> Belakang
+                </h2>
+                <iframe id="backCardIframe" class="w-full h-96 border" style="width: 54mm; height: 85mm;"></iframe>
+                <div class="flex justify-center mt-4">
+                  <button onclick="downloadPdf('back')" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    Muat Turun Belakang
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div id="previewNotFound" class="hidden text-center py-8">
+              <i class="fas fa-id-card text-gray-300 text-5xl mb-4"></i>
+              <h3 class="text-lg font-medium text-gray-700">Kad tidak ditemukan</h3>
+              <p class="text-gray-500 mt-2">Sila cari menggunakan ID Kad atau daftar kad baru</p>
+            </div>
+            
+            <div class="mt-8 flex justify-center space-x-4">
+              <button onclick="openTab('daftar')" class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Footer -->
-  <footer class="bg-gray-800 text-white text-center py-4 mt-auto">
+  <footer id="footer">
     <p>© 2025 Jabatan Imigresen Malaysia Negeri Sarawak. Hak Cipta Terpelihara. Disediakan oleh: PI KP2 (TBK1) Mohammad Azzer bin Taip. Unit Perancangan Strategik dan Khidmat Korporat.</p>
   </footer>
 
