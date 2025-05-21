@@ -1,21 +1,44 @@
-/* Custom styles to complement Tailwind CSS */
-.modal {
-  transition: opacity 0.3s ease-in-out;
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-.tab-button.active {
-  background-color: #3b82f6;
-  color: white;
-}
-
-video, canvas {
-  max-width: 100%;
-}
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .print-content, .print-content * {
+        visibility: visible;
+      }
+      .print-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .id-card {
+        width: 54mm !important;
+        height: 85mm !important;
+      }
+    }
+    .id-card {
+      width: 54mm;
+      height: 85mm;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #1e40af;
+      color: white;
+      padding: 1rem 0;
+      text-align: center;
+      transition: transform 0.3s ease-in-out;
+      transform: translateY(100%);
+      z-index: 40;
+    }
+    footer.visible {
+      transform: translateY(0);
+    }
+    .photo-preview {
+      max-width: 150px;
+      max-height: 150px;
+      object-fit: cover;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
