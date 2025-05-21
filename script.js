@@ -1,565 +1,396 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycbxQkvOIqVqCUOPHZoxPynucEE60L6ehqdpv7mhhvzzQxm6EhXYUiuVuC_JyqNdl3if6/exec'; // Replace with your Google Apps Script web app URL
+const API_URL = 'https://script.google.com/macros/s/AKfycbwcnDxJ_aLuk-U90qfx8LCetqEfkUn7zvH0TOD9wA_FghqjRfLbdZsWC742yhRgkScy/exec'; // Replace with your Google Apps Script Web App URL
 
 // Utility Functions
-function showModal(modalId) {
-  document.getElementById(modalId).classList.add('show');
+function showModal(modalId, message = '') {
+  document.querySelectorAll('.modal').forEach(modal => modal.classList.add('hidden'));
+  const modal = document.getElementById(modalId);
+  modal.classList.remove('hidden');
+  if (message && modalId === 'errorModal') document.getElementById('errorMessage').textContent = message;
+  if (message && modalId === 'successModal') document.getElementById('successMessage').textContent = message;
+  if (message && modalId === 'confirmationModal') document.getElementById('confirmationMessage').textContent = message;
 }
 
 function hideModal(modalId) {
-  document.getElementById(modalId).classList.remove('show');
+  document.getElementById(modalId).classList.add('hidden');
 }
 
-function showError(message) {
-  document.getElementById('errorMessage').textContent = message;
-  showModal('errorModal');
-}
-
-function showNotification(message) {
-  document.getElementById('notificationMessage').textContent = message;
-  showModal('notificationModal');
-}
-
-function showConfirmation(message, callback) {
-  document.getElementById('confirmationMessage').textContent = message;
-  showModal('confirmationModal');
-  document.getElementById('confirmAction').onclick = () => {
-    callback();
-    hideModal('confirmationModal');
-  };
-}
-
-// Tab Navigation
-function switchTab(tabId) {
+function toggleTabs(activeTab) {
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.querySelectorAll('.tab-button').forEach(button => {
-    button.classList.replace('bg-blue-500', 'bg-gray-300');
-    button.classList.replace('text-white', 'text-gray-700');
-  });
-  document.getElementById(tabId).classList.add('active');
-  document.getElementById(`${tabId.replace('Section', 'Tab')}`).classList.replace('bg-gray-300', 'bg-blue-500');
-  document.getElementById(`${tabId.replace('Section', 'Tab')}`).classList.replace('text-gray-700', 'text-white');
+  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active', 'bg-blue-500', 'text-white'));
+  document.getElementById(`${activeTab}Section`).classList.add('active');
+  document.getElementById(`${activeTab}Tab`).classList.add('active', 'bg-blue-500', 'text-white');
 }
 
-// Login
-document.getElementById('loginButton').addEventListener('click', () => {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=verifyLogin`, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: JSON.stringify({ username, password }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      if (result.success) {
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('mainSection').classList.remove('hidden');
-        switchTab('registerSection');
-      } else {
-        showError('Log masuk gagal. Sila semak nombor kad pengenalan atau kata laluan.');
-      }
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
-});
-
-// Logout
-document.getElementById('logoutButton').addEventListener('click', () => {
-  document.getElementById('mainSection').classList.add('hidden');
-  document.getElementById('loginSection').classList.remove('hidden');
-  document.getElementById('username').value = '';
-  document.getElementById('password').value = '';
-});
-
-// Tab Switching
-document.getElementById('registerTab').addEventListener('click', () => switchTab('registerSection'));
-document.getElementById('updateTab').addEventListener('click', () => switchTab('updateSection'));
-document.getElementById('lostTab').addEventListener('click', () => {
-  switchTab('lostSection');
-  loadRegisteredList();
-});
-document.getElementById('settingsTab').addEventListener('click', () => switchTab('settingsSection'));
-document.getElementById('previewTab').addEventListener('click', () => switchTab('previewSection'));
-
-// Check Unique ID
-document.getElementById('checkUniqueId').addEventListener('click', () => {
-  const uniqueId = document.getElementById('uniqueId').value;
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=checkUniqueIdAvailability`, {
-    method: 'POST',
-    body: JSON.stringify({ manualId: uniqueId }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      document.getElementById('uniqueIdMessage').textContent = result.message;
-      document.getElementById('uniqueIdMessage').classList.toggle('text-green-500', result.available);
-      document.getElementById('uniqueIdMessage').classList.toggle('text-red-500', !result.available);
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
-});
-
-// Save Registration
-document.getElementById('saveRegistration').addEventListener('click', () => {
-  const data = {
-    uniqueId: 'JIMSWK' + document.getElementById('uniqueId').value,
-    name: document.getElementById('name').value,
-    displayName: document.getElementById('displayName').value,
-    icNumber: document.getElementById('icNumber').value,
-    phone: document.getElementById('phone').value,
-    position: document.getElementById('position').value,
-    status: document.getElementById('status').value,
-    emergencyContact: document.getElementById('emergencyContact').value,
-    emergencyPhone: document.getElementById('emergencyPhone').value,
-    medicalCondition: document.getElementById('medicalCondition').value,
-    photo: null
-  };
-
-  const photoInput = document.getElementById('photo').files[0];
-  if (photoInput) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      data.photo = {
-        data: e.target.result.split(',')[1],
-        type: photoInput.type,
-        name: photoInput.name
-      };
-      submitRegistration(data);
-    };
-    reader.readAsDataURL(photoInput);
-  } else {
-    submitRegistration(data);
+function clearForm(formId) {
+  document.getElementById(formId).reset();
+  if (formId === 'registerSection') {
+    document.getElementById('idAvailability').textContent = '';
+    document.getElementById('displayName').innerHTML = '<option value="">Pilih Nama</option>';
   }
-});
-
-function submitRegistration(data) {
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=saveRegistration`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      showNotification('Pendaftaran berjaya! ID Kad: ' + result.uniqueId);
-      document.getElementById('resetRegistration').click();
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
-}
-
-// Reset Registration
-document.getElementById('resetRegistration').addEventListener('click', () => {
-  document.getElementById('uniqueId').value = '';
-  document.getElementById('name').value = '';
-  document.getElementById('displayName').value = '';
-  document.getElementById('icNumber').value = '';
-  document.getElementById('phone').value = '';
-  document.getElementById('position').value = '';
-  document.getElementById('status').value = '';
-  document.getElementById('emergencyContact').value = '';
-  document.getElementById('emergencyPhone').value = '';
-  document.getElementById('medicalCondition').value = '';
-  document.getElementById('photo').value = '';
-  document.getElementById('uniqueIdMessage').textContent = '';
-});
-
-// Update Section Search
-document.getElementById('searchUpdateButton').addEventListener('click', () => {
-  const searchValue = document.getElementById('searchUpdate').value;
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=searchRecord`, {
-    method: 'POST',
-    body: JSON.stringify({ searchValue }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      if (result) {
-        document.getElementById('updateForm').classList.remove('hidden');
-        document.getElementById('updateButtons').classList.remove('hidden');
-        document.getElementById('updateUniqueId').value = result.uniqueId;
-        document.getElementById('updateName').value = result.name;
-        document.getElementById('updateDisplayName').value = result.displayName;
-        document.getElementById('updateIcNumber').value = result.icNumber;
-        document.getElementById('updatePhone').value = result.phone;
-        document.getElementById('updatePosition').value = result.position;
-        document.getElementById('updateStatus').value = result.status;
-        document.getElementById('updateEmergencyContact').value = result.emergencyContact;
-        document.getElementById('updateEmergencyPhone').value = result.emergencyPhone;
-        document.getElementById('updateMedicalCondition').value = result.medicalCondition;
-        document.getElementById('oldPhoto').src = result.photoUrl || '';
-      } else {
-        showError('Rekod tidak ditemukan');
-      }
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
-});
-
-// Update and Reprint
-document.getElementById('updateAndReprintButton').addEventListener('click', () => {
-  const data = {
-    uniqueId: document.getElementById('updateUniqueId').value,
-    name: document.getElementById('updateName').value,
-    displayName: document.getElementById('updateDisplayName').value,
-    icNumber: document.getElementById('updateIcNumber').value,
-    phone: document.getElementById('updatePhone').value,
-    position: document.getElementById('updatePosition').value,
-    status: document.getElementById('updateStatus').value,
-    emergencyContact: document.getElementById('updateEmergencyContact').value,
-    emergencyPhone: document.getElementById('updateEmergencyPhone').value,
-    medicalCondition: document.getElementById('updateMedicalCondition').value,
-    photo: null
-  };
-
-  const photoInput = document.getElementById('updatePhoto').files[0];
-  if (photoInput) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      data.photo = {
-        data: e.target.result.split(',')[1],
-        type: photoInput.type,
-        name: photoInput.name
-      };
-      submitUpdate(data);
-    };
-    reader.readAsDataURL(photoInput);
-  } else {
-    submitUpdate(data);
+  if (formId === 'updateSection') {
+    document.getElementById('updateForm').classList.add('hidden');
+    document.getElementById('updatePhotoPreview').src = '';
   }
-});
-
-function submitUpdate(data) {
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=updateAndReprint`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      if (result.success) {
-        showNotification('Kemaskini dan cetak semula berjaya! ID Kad: ' + result.uniqueId);
-      } else {
-        showError('Gagal mengemaskini dan mencetak semula');
-      }
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
 }
 
-// Reprint
-document.getElementById('reprintButton').addEventListener('click', () => {
-  const uniqueId = document.getElementById('updateUniqueId').value;
+// API Call Wrapper
+async function apiCall(functionName, data) {
   showModal('loadingModal');
-  fetch(`${scriptURL}?action=reprintForUpdate`, {
-    method: 'POST',
-    body: JSON.stringify({ uniqueId }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      if (result.success) {
-        showNotification('Cetak semula berjaya! ID Kad: ' + result.uniqueId);
-      } else {
-        showError('Gagal mencetak semula kad');
-      }
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
-});
-
-// Lost Card Search
-document.getElementById('searchLostButton').addEventListener('click', () => {
-  const searchValue = document.getElementById('searchLost').value;
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=searchRecord`, {
-    method: 'POST',
-    body: JSON.stringify({ searchValue }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      if (result) {
-        document.getElementById('lostInfo').classList.remove('hidden');
-        document.getElementById('lostUniqueId').textContent = result.uniqueId;
-        document.getElementById('lostName').textContent = result.name;
-        document.getElementById('lostIcNumber').textContent = result.icNumber;
-        document.getElementById('lostPhone').textContent = result.phone;
-        document.getElementById('lostPosition').textContent = result.position;
-        document.getElementById('lostStatus').textContent = result.status;
-        document.getElementById('lostEmergencyContact').textContent = result.emergencyContact;
-        document.getElementById('lostEmergencyPhone').textContent = result.emergencyPhone;
-      } else {
-        showError('Rekod tidak ditemukan');
-      }
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
-});
-
-// Report Lost
-document.getElementById('reportLostButton').addEventListener('click', () => {
-  const uniqueId = document.getElementById('lostUniqueId').textContent;
-  showConfirmation('Adakah anda pasti ingin melaporkan kad ini sebagai hilang?', () => {
-    showModal('loadingModal');
-    fetch(`${scriptURL}?action=reportLost`, {
+  try {
+    const response = await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ uniqueId }),
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(response => response.json())
-      .then(result => {
-        hideModal('loadingModal');
-        showNotification('Kad telah dilaporkan sebagai hilang');
-        document.getElementById('lostInfo').classList.add('hidden');
-        loadRegisteredList();
-      })
-      .catch(error => {
-        hideModal('loadingModal');
-        showError(error.message);
-      });
-  });
-});
-
-// Load Registered List
-function loadRegisteredList() {
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=getRegisteredList`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(list => {
-      hideModal('loadingModal');
-      const tbody = document.getElementById('registeredList');
-      tbody.innerHTML = '';
-      list.forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.uniqueId}</td>
-          <td>${item.position}</td>
-          <td>${item.printCount}</td>
-          <td>${item.lostStatus}</td>
-          <td>
-            <button class="reprint-lost bg-blue-500 text-white px-2 py-1 rounded" data-id="${item.uniqueId}">Cetak Semula</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-      document.querySelectorAll('.reprint-lost').forEach(button => {
-        button.addEventListener('click', () => {
-          const uniqueId = button.dataset.id;
-          showConfirmation('Adakah anda pasti ingin mencetak semula kad ini?', () => {
-            showModal('loadingModal');
-            fetch(`${scriptURL}?action=reprintLostCard`, {
-              method: 'POST',
-              body: JSON.stringify({ uniqueId }),
-              headers: { 'Content-Type': 'application/json' }
-            })
-              .then(response => response.json())
-              .then(result => {
-                hideModal('loadingModal');
-                if (result.success) {
-                  showNotification('Cetak semula berjaya! ID Kad: ' + result.newUniqueId);
-                  loadRegisteredList();
-                } else {
-                  showError('Gagal mencetak semula kad');
-                }
-              })
-              .catch(error => {
-                hideModal('loadingModal');
-                showError(error.message);
-              });
-          });
-        });
-      });
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ functionName, data }),
     });
-}
-
-// Change Password
-document.getElementById('changePasswordButton').addEventListener('click', () => {
-  const currentPassword = document.getElementById('currentPassword').value;
-  const newPassword = document.getElementById('newPassword').value;
-  const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-  if (newPassword !== confirmNewPassword) {
-    showError('Kata laluan baru dan pengesahan tidak sepadan');
-    return;
+    const result = await response.json();
+    hideModal('loadingModal');
+    if (result.error) throw new Error(result.error);
+    return result.data;
+  } catch (error) {
+    hideModal('loadingModal');
+    showModal('errorModal', error.message);
+    throw error;
   }
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=changePassword`, {
-    method: 'POST',
-    body: JSON.stringify({ username: document.getElementById('username').value, currentPassword, newPassword }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      if (result) {
-        showNotification('Kata laluan ditukar dengan jayanya');
-        document.getElementById('currentPassword').value = '';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmNewPassword').value = '';
-      } else {
-        showError('Gagal menukar kata laluan');
-      }
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
-});
-
-// Preview Card
-document.getElementById('previewSearchButton').addEventListener('click', () => {
-  const searchValue = document.getElementById('previewSearch').value;
-  showModal('loadingModal');
-  fetch(`${scriptURL}?action=searchRecord`, {
-    method: 'POST',
-    body: JSON.stringify({ searchValue }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(result => {
-      hideModal('loadingModal');
-      if (result) {
-        document.getElementById('noCardFound').classList.add('hidden');
-        document.getElementById('previewContent').classList.remove('hidden');
-        fetch(`${scriptURL}?action=serveFile&fileId=${result.frontPdfId}`)
-          .then(response => response.json())
-          .then(data => {
-            document.getElementById('frontPreview').src = `data:application/pdf;base64,${data}`;
-          });
-        fetch(`${scriptURL}?action=serveFile&fileId=${result.backPdfId}`)
-          .then(response => response.json())
-          .then(data => {
-            document.getElementById('backPreview').src = `data:application/pdf;base64,${data}`;
-          });
-      } else {
-        document.getElementById('previewContent').classList.add('hidden');
-        document.getElementById('noCardFound').classList.remove('hidden');
-      }
-    })
-    .catch(error => {
-      hideModal('loadingModal');
-      showError(error.message);
-    });
-});
-
-// Download Front
-document.getElementById('downloadFront').addEventListener('click', () => {
-  const src = document.getElementById('frontPreview').src;
-  const link = document.createElement('a');
-  link.href = src;
-  link.download = 'front.pdf';
-  link.click();
-});
-
-// Download Back
-document.getElementById('downloadBack').addEventListener('click', () => {
-  const src = document.getElementById('backPreview').src;
-  const link = document.createElement('a');
-  link.href = src;
-  link.download = 'back.pdf';
-  link.click();
-});
-
-// Back to Search
-document.getElementById('backToSearch').addEventListener('click', () => {
-  document.getElementById('previewContent').classList.add('hidden');
-  document.getElementById('noCardFound').classList.add('hidden');
-  document.getElementById('previewSearch').value = '';
-});
+}
 
 // Camera Functionality
 let stream = null;
+async function startCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    document.getElementById('video').srcObject = stream;
+    showModal('cameraModal');
+  } catch (error) {
+    showModal('errorModal', 'Gagal mengakses kamera: ' + error.message);
+  }
+}
 
-document.getElementById('capturePhoto').addEventListener('click', () => {
-  showModal('cameraModal');
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(s => {
-      stream = s;
-      document.getElementById('video').srcObject = stream;
-    })
-    .catch(error => {
-      showError('Gagal mengakses kamera: ' + error.message);
-      hideModal('cameraModal');
-    });
-});
-
-document.getElementById('updateCapturePhoto').addEventListener('click', () => {
-  showModal('cameraModal');
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(s => {
-      stream = s;
-      document.getElementById('video').srcObject = stream;
-    })
-    .catch(error => {
-      showError('Gagal mengakses kamera: ' + error.message);
-      hideModal('cameraModal');
-    });
-});
-
-document.getElementById('takePhoto').addEventListener('click', () => {
+function capturePhoto() {
   const video = document.getElementById('video');
   const canvas = document.getElementById('canvas');
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   canvas.getContext('2d').drawImage(video, 0, 0);
   const dataUrl = canvas.toDataURL('image/jpeg');
-  const input = document.getElementById('photo');
-  fetch(dataUrl)
-    .then(res => res.blob())
-    .then(blob => {
-      const file = new File([blob], 'captured_photo.jpg', { type: 'image/jpeg' });
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      input.files = dataTransfer.files;
-      hideModal('cameraModal');
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    });
-});
-
-document.getElementById('cancelCamera').addEventListener('click', () => {
-  hideModal('cameraModal');
+  document.getElementById('photo').files = dataURLtoFile(dataUrl, 'photo.jpg');
   if (stream) {
     stream.getTracks().forEach(track => track.stop());
   }
+  hideModal('cameraModal');
+}
+
+function dataURLtoFile(dataUrl, filename) {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  return new File([u8arr], filename, { type: mime });
+}
+
+// Login
+document.getElementById('loginButton').addEventListener('click', async () => {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  try {
+    const result = await apiCall('verifyLogin', { username, password });
+    if (result.success) {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('mainSection').classList.remove('hidden');
+      toggleTabs('register');
+    } else {
+      showModal('errorModal', 'No. Kad Pengenalan atau kata laluan tidak sah');
+    }
+  } catch (error) {
+    // Error handled in apiCall
+  }
 });
 
-// Modal Close Buttons
+// Logout
+document.getElementById('logoutButton').addEventListener('click', () => {
+  document.getElementById('mainSection').classList.add('hidden');
+  document.getElementById('loginSection').classList.remove('hidden');
+  clearForm('registerSection');
+  clearForm('updateSection');
+});
+
+// Tab Navigation
+document.querySelectorAll('.tab-button').forEach(button => {
+  button.addEventListener('click', () => {
+    const tab = button.id.replace('Tab', '');
+    toggleTabs(tab);
+    if (tab === 'lost') loadRegisteredList();
+  });
+});
+
+// Check ID Availability
+document.getElementById('checkIdButton').addEventListener('click', async () => {
+  const uniqueId = document.getElementById('uniqueId').value;
+  try {
+    const result = await apiCall('checkUniqueIdAvailability', uniqueId);
+    document.getElementById('idAvailability').textContent = result.message;
+    document.getElementById('idAvailability').classList.toggle('text-green-500', result.available);
+    document.getElementById('idAvailability').classList.toggle('text-red-500', !result.available);
+  } catch (error) {
+    // Error handled in apiCall
+  }
+});
+
+// Save Registration
+document.getElementById('saveRegistrationButton').addEventListener('click', async () => {
+  const photo = document.getElementById('photo').files[0];
+  if (photo && photo.size > 2 * 1024 * 1024) {
+    showModal('errorModal', 'Saiz foto melebihi 2MB');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const data = {
+      uniqueId: 'JIMSWK' + document.getElementById('uniqueId').value,
+      name: document.getElementById('name').value,
+      displayName: document.getElementById('displayName').value,
+      icNumber: document.getElementById('icNumber').value,
+      phone: document.getElementById('phone').value,
+      position: document.getElementById('position').value,
+      status: document.getElementById('status').value,
+      emergencyContact: document.getElementById('emergencyContact').value,
+      emergencyPhone: document.getElementById('emergencyPhone').value,
+      medicalCondition: document.getElementById('medicalCondition').value,
+      photo: photo ? { data: reader.result.split(',')[1], type: photo.type } : null,
+    };
+    try {
+      const result = await apiCall('saveRegistration', data);
+      showModal('successModal', `Pendaftaran berjaya! ID Kad: ${result.uniqueId}`);
+      clearForm('registerSection');
+    } catch (error) {
+      // Error handled in apiCall
+    }
+  };
+  if (photo) reader.readAsDataURL(photo);
+  else showModal('errorModal', 'Gambar diperlukan untuk pendaftaran baru');
+});
+
+// Reset Registration Form
+document.getElementById('resetRegistrationButton').addEventListener('click', () => clearForm('registerSection'));
+
+// Camera Handlers
+document.getElementById('capturePhotoButton').addEventListener('click', startCamera);
+document.getElementById('updateCapturePhotoButton').addEventListener('click', startCamera);
+document.getElementById('captureButton').addEventListener('click', capturePhoto);
+document.getElementById('cancelCapture').addEventListener('click', () => {
+  if (stream) stream.getTracks().forEach(track => track.stop());
+  hideModal('cameraModal');
+});
+
+// Update Record Search
+document.getElementById('searchUpdateButton').addEventListener('click', async () => {
+  const searchValue = document.getElementById('searchUpdate').value;
+  try {
+    const record = await apiCall('searchRecord', searchValue);
+    if (record) {
+      document.getElementById('updateForm').classList.remove('hidden');
+      document.getElementById('updateUniqueId').value = record.uniqueId;
+      document.getElementById('updateName').value = record.name;
+      document.getElementById('updateDisplayName').innerHTML = `<option value="${record.displayName}">${record.displayName}</option>`;
+      document.getElementById('updateIcNumber').value = record.icNumber;
+      document.getElementById('updatePhone').value = record.phone;
+      document.getElementById('updatePosition').value = record.position;
+      document.getElementById('updateStatus').value = record.status;
+      document.getElementById('updateEmergencyContact').value = record.emergencyContact;
+      document.getElementById('updateEmergencyPhone').value = record.emergencyPhone;
+      document.getElementById('updateMedicalCondition').value = record.medicalCondition;
+      document.getElementById('updatePhotoPreview').src = record.photoUrl;
+    } else {
+      showModal('errorModal', 'Rekod tidak ditemukan');
+    }
+  } catch (error) {
+    // Error handled in apiCall
+  }
+});
+
+// Update Record
+document.getElementById('updateRecordButton').addEventListener('click', async () => {
+  const photo = document.getElementById('updatePhoto').files[0];
+  if (photo && photo.size > 2 * 1024 * 1024) {
+    showModal('errorModal', 'Saiz foto melebihi 2MB');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const data = {
+      uniqueId: document.getElementById('updateUniqueId').value,
+      name: document.getElementById('updateName').value,
+      displayName: document.getElementById('updateDisplayName').value,
+      icNumber: document.getElementById('updateIcNumber').value,
+      phone: document.getElementById('updatePhone').value,
+      position: document.getElementById('updatePosition').value,
+      status: document.getElementById('updateStatus').value,
+      emergencyContact: document.getElementById('updateEmergencyContact').value,
+      emergencyPhone: document.getElementById('updateEmergencyPhone').value,
+      medicalCondition: document.getElementById('updateMedicalCondition').value,
+      photo: photo ? { data: reader.result.split(',')[1], type: photo.type } : null,
+    };
+    try {
+      const result = await apiCall('updateRecord', data);
+      showModal('successModal', `Kemaskini berjaya! ID Kad: ${result.uniqueId}`);
+      clearForm('updateSection');
+    } catch (error) {
+      // Error handled in apiCall
+    }
+  };
+  if (photo) reader.readAsDataURL(photo);
+  else reader.onload();
+});
+
+// Load Registered List
+async function loadRegisteredList() {
+  try {
+    const list = await apiCall('getRegisteredList', {});
+    const tbody = document.querySelector('#registeredList tbody');
+    tbody.innerHTML = '';
+    list.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="border px-4 py-2">${item.name}</td>
+        <td class="border px-4 py-2">${item.uniqueId}</td>
+        <td class="border px-4 py-2">${item.position}</td>
+        <td class="border px-4 py-2">${item.printCount}</td>
+        <td class="border px-4 py-2">${item.lostStatus}</td>
+        <td class="border px-4 py-2">
+          <button class="reprintButton bg-blue-500 text-white px-2 py-1 rounded" data-uniqueid="${item.uniqueId}">Cetak Semula</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+    document.querySelectorAll('.reprintButton').forEach(button => {
+      button.addEventListener('click', () => {
+        const uniqueId = button.dataset.uniqueid;
+        showModal('confirmationModal', `Adakah anda pasti ingin mencetak semula kad untuk ${uniqueId}?`);
+        document.getElementById('confirmConfirmation').onclick = () => reprintLostCard(uniqueId);
+      });
+    });
+  } catch (error) {
+    // Error handled in apiCall
+  }
+}
+
+// Report Lost Card
+document.getElementById('searchLostButton').addEventListener('click', async () => {
+  const searchValue = document.getElementById('searchLost').value;
+  try {
+    const record = await apiCall('searchRecord', searchValue);
+    if (record) {
+      document.getElementById('lostCardInfo').classList.remove('hidden');
+      document.getElementById('lostUniqueId').textContent = record.uniqueId;
+      document.getElementById('lostName').textContent = record.name;
+      document.getElementById('lostIcNumber').textContent = record.icNumber;
+      document.getElementById('lostPhone').textContent = record.phone;
+      document.getElementById('lostPosition').textContent = record.position;
+      document.getElementById('lostStatus').textContent = record.status;
+      document.getElementById('lostEmergencyContact').textContent = record.emergencyContact;
+      document.getElementById('lostEmergencyPhone').textContent = record.emergencyPhone;
+    } else {
+      showModal('errorModal', 'Rekod tidak ditemukan');
+    }
+  } catch (error) {
+    // Error handled in apiCall
+  }
+});
+
+document.getElementById('reportLostButton').addEventListener('click', async () => {
+  const uniqueId = document.getElementById('lostUniqueId').textContent;
+  showModal('confirmationModal', `Adakah anda pasti ingin melaporkan kad ${uniqueId} sebagai hilang?`);
+  document.getElementById('confirmConfirmation').onclick = async () => {
+    try {
+      await apiCall('reportLost', uniqueId);
+      showModal('successModal', 'Kehilangan dilaporkan dengan jayanya');
+      document.getElementById('lostCardInfo').classList.add('hidden');
+      loadRegisteredList();
+    } catch (error) {
+      // Error handled in apiCall
+    }
+  };
+});
+
+// Reprint Lost Card
+async function reprintLostCard(uniqueId) {
+  try {
+    const result = await apiCall('reprintLostCard', uniqueId);
+    showModal('successModal', `Kad dicetak semula! ID Kad Baru: ${result.newUniqueId}`);
+    loadRegisteredList();
+  } catch (error) {
+    // Error handled in apiCall
+  }
+}
+
+// Change Password
+document.getElementById('changePasswordButton').addEventListener('click', async () => {
+  const currentPassword = document.getElementById('currentPassword').value;
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+  if (newPassword !== confirmNewPassword) {
+    showModal('errorModal', 'Kata laluan baru tidak sepadan');
+    return;
+  }
+  try {
+    await apiCall('changePassword', {
+      username: document.getElementById('username').value, // Assumes username is stored or re-entered
+      currentPassword,
+      newPassword,
+    });
+    showModal('successModal', 'Kata laluan ditukar dengan jayanya');
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmNewPassword').value = '';
+  } catch (error) {
+    // Error handled in apiCall
+  }
+});
+
+// Preview Card
+document.getElementById('searchPreviewButton').addEventListener('click', async () => {
+  const searchValue = document.getElementById('searchPreview').value;
+  try {
+    const result = await apiCall('searchPreview', searchValue);
+    if (result) {
+      document.getElementById('previewContent').classList.remove('hidden');
+      document.getElementById('noCardFound').classList.add('hidden');
+      const frontUrl = await apiCall('serveFile', result.frontPdfId);
+      const backUrl = await apiCall('serveFile', result.backPdfId);
+      document.getElementById('frontPreview').src = `data:application/pdf;base64,${frontUrl}`;
+      document.getElementById('backPreview').src = `data:application/pdf;base64,${backUrl}`;
+      document.getElementById('downloadFrontButton').onclick = () => downloadFile(frontUrl, `${result.uniqueId}_Front.pdf`);
+      document.getElementById('downloadBackButton').onclick = () => downloadFile(backUrl, `${result.uniqueId}_Back.pdf`);
+    } else {
+      document.getElementById('previewContent').classList.add('hidden');
+      document.getElementById('noCardFound').classList.remove('hidden');
+    }
+  } catch (error) {
+    // Error handled in apiCall
+  }
+});
+
+function downloadFile(base64, filename) {
+  const link = document.createElement('a');
+  link.href = `data:application/pdf;base64,${base64}`;
+  link.download = filename;
+  link.click();
+}
+
+// Modal Close Handlers
 document.getElementById('closeErrorModal').addEventListener('click', () => hideModal('errorModal'));
-document.getElementById('closeNotificationModal').addEventListener('click', () => hideModal('notificationModal'));
+document.getElementById('closeSuccessModal').addEventListener('click', () => hideModal('successModal'));
 document.getElementById('cancelConfirmation').addEventListener('click', () => hideModal('confirmationModal'));
+
+// Populate Display Name Options
+document.getElementById('name').addEventListener('input', () => {
+  const name = document.getElementById('name').value;
+  const displayNameSelect = document.getElementById('displayName');
+  displayNameSelect.innerHTML = `<option value="${name}">${name}</option>`;
+});
+document.getElementById('updateName').addEventListener('input', () => {
+  const name = document.getElementById('updateName').value;
+  const displayNameSelect = document.getElementById('updateDisplayName');
+  displayNameSelect.innerHTML = `<option value="${name}">${name}</option>`;
+});
